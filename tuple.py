@@ -8,7 +8,8 @@ class Tuple:
         self.w = w
 
     def __eq__(self, other):
-        return self.x == other.x and self.y == other.y and self.z == other.z and self.w == other.w
+        epsilon = 0.00001
+        return abs(self.x - other.x) < epsilon and abs(self.y - other.y) < epsilon and abs(self.z - other.z) < epsilon and abs(self.w - other.w) < epsilon
 
     def __add__(self, other):
         return Tuple(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
