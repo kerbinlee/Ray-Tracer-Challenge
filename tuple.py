@@ -1,4 +1,5 @@
 import math
+from constants import Constants
 
 class Tuple:
     def __init__(self, x, y, z, w):
@@ -8,8 +9,7 @@ class Tuple:
         self.w = w
 
     def __eq__(self, other):
-        epsilon = 0.00001
-        return abs(self.x - other.x) < epsilon and abs(self.y - other.y) < epsilon and abs(self.z - other.z) < epsilon and abs(self.w - other.w) < epsilon
+        return abs(self.x - other.x) < Constants.epsilon and abs(self.y - other.y) < Constants.epsilon and abs(self.z - other.z) < Constants.epsilon and abs(self.w - other.w) < Constants.epsilon
 
     def __add__(self, other):
         return Tuple(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
