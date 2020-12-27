@@ -47,15 +47,15 @@ class TestTuple(unittest.TestCase):
 
     def test_scalar_multiplication(self):
         a = Tuple(1, -2, 3, -4)
-        self.assertEqual(a.scalar_multiply(3.5), Tuple(3.5, -7, 10.5, -14))
+        self.assertEqual(a * 3.5, Tuple(3.5, -7, 10.5, -14))
 
     def test_scalar_multiplication_fractions(self):
         a = Tuple(1, -2, 3, -4)
-        self.assertEqual(a.scalar_multiply(0.5), Tuple(0.5, -1, 1.5, -2))
+        self.assertEqual(a * 0.5, Tuple(0.5, -1, 1.5, -2))
 
     def test_scalar_division(self):
         a = Tuple(1, -2, 3, -4)
-        self.assertEqual(a.scalar_divide(2), Tuple(0.5, -1, 1.5, -2))
+        self.assertEqual(a / 2, Tuple(0.5, -1, 1.5, -2))
 
     def test_magnitude_x(self):
         v = Vector(1, 0, 0)

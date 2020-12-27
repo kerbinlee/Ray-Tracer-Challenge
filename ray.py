@@ -7,7 +7,7 @@ class Ray:
         self.direction: Vector = direction
 
     def position(self, distance):
-        return self.origin + self.direction.scalar_multiply(distance)
+        return self.origin + self.direction * distance
 
     def transform(ray, matrix):
         return Ray(Matrix.multiply_tuple(matrix, ray.origin), Matrix.multiply_tuple(matrix, ray.direction))

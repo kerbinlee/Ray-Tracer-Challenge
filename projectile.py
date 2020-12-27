@@ -16,7 +16,7 @@ class Environment:
         self.wind = wind
 
 if __name__ == '__main__':
-    p = Projectile(Point(0, 1, 0), Vector(1, 1.8, 0).normalize().scalar_multiply(11.25))
+    p = Projectile(Point(0, 1, 0), Vector(1, 1.8, 0).normalize() * 11.25)
     e = Environment(Vector(0, -0.1, 0), Vector(-0.01, 0, 0))
 
     c = Canvas(900, 500)

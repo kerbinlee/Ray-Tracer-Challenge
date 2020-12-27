@@ -17,14 +17,14 @@ class Tuple:
     def __sub__(self, other):
         return Tuple(self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w)
 
-    def scalar_multiply(self, multiplier):
-        return Tuple(self.x * multiplier, self.y * multiplier, self.z * multiplier, self.w * multiplier)
+    def __mul__(self, other):
+        return Tuple(self.x * other, self.y * other, self.z * other, self.w * other)
 
-    def scalar_divide(self, divisor):
+    def __truediv__(self, divisor):
         return Tuple(self.x / divisor, self.y / divisor, self.z / divisor, self.w / divisor)
 
     def __neg__(self):
-        return self.scalar_multiply(-1)
+        return self * -1
 
     # TODO: should this be in Vector?
     def magnitude(self):

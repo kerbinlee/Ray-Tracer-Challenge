@@ -22,7 +22,7 @@ class TestColor(unittest.TestCase):
 
     def test_scalar_multiply_color(self):
         c = Color(0.2, 0.3, 0.4)
-        self.assertEqual(c.scalar_multiply(2), Color(0.4, 0.6, 0.8))
+        self.assertEqual(c * 2, Color(0.4, 0.6, 0.8))
 
     def test_multiply_color(self):
         c1 = Color(1, 0.2, 0.4)
