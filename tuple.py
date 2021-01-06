@@ -31,14 +31,14 @@ class Tuple:
         return math.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2 + self.w **2)
 
     # TODO: should this be in Vector?
-    def normalize(self):
+    def normalize(tuple: 'Tuple') -> 'Tuple':
         # TODO: Can only normalize non-zero magnitude vectors
-        magnitude = self.magnitude()
-        return Tuple(self.x / magnitude, self.y / magnitude, self.z / magnitude, self.w / magnitude)
+        magnitude = tuple.magnitude()
+        return Tuple(tuple.x / magnitude, tuple.y / magnitude, tuple.z / magnitude, tuple.w / magnitude)
 
     # TODO: should this be in Vector?
-    def dot(self, other):
-        return self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
+    def dot(a: 'Tuple', b: 'Tuple') -> float:
+        return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
 
     def __str__(self):
         return f"x={self.x} y={self.y} z={self.z}"
@@ -53,3 +53,6 @@ class Vector(Tuple):
 
     def cross(self, other):
         return Vector(self.y * other.z - self.z * other.y, self.z * other.x - self.x * other.z, self.x * other.y - self.y * other.x)
+
+    def reflect(in_vector: 'Vector', normal: 'Vector') -> 'Vector':
+        return  in_vector - normal * 2 * Vector.dot(in_vector, normal)

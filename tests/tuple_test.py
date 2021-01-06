@@ -79,26 +79,41 @@ class TestTuple(unittest.TestCase):
         
     def test_normalize_1(self):
         v = Vector(4, 0, 0)
-        self.assertEqual(v.normalize(), Vector(1, 0, 0))
+        self.assertEqual(Vector.normalize(v), Vector(1, 0, 0))
 
     def test_normalize_2(self):
         v = Vector(1, 2, 3)
-        self.assertEqual(v.normalize(), Vector(1 / math.sqrt(14), 2 / math.sqrt(14), 3 / math.sqrt(14)))
+        self.assertEqual(Vector.normalize(v), Vector(1 / math.sqrt(14), 2 / math.sqrt(14), 3 / math.sqrt(14)))
 
     def test_magniture_normalized(self):
         v = Vector(1, 2, 3)
-        self.assertEqual(v.normalize().magnitude(), 1)
+        self.assertEqual(Vector.normalize(v).magnitude(), 1)
 
     def test_dot_product(self):
         a = Vector(1, 2, 3)
         b = Vector(2, 3, 4)
-        self.assertEqual(a.dot(b), 20)
+        self.assertEqual(Vector.dot(a, b), 20)
 
     def test_cross_product(self):
         a = Vector(1, 2, 3)
         b = Vector(2, 3, 4)
         self.assertEqual(a.cross(b), Vector(-1, 2, -1))
         self.assertEqual(b.cross(a), Vector(1, -2, 1))
+
+    # Scenario: Reflecting a vector approaching at 45°
+    def test_reflect_vector_45_degrees(self):
+        v = Vector(1, -1, 0)
+        n = Vector(0, 1, 0)
+        r = Vector.reflect(v, n)
+        self.assertEqual(r ,Vector(1, 1, 0))
         
+    # Scenario: Reflecting a vector off a slanted surface
+    def test_reflect_vector_slanted_surface(self):
+        v = Vector(0, -1, 0)
+        n = Vector(math.sqrt(2) / 2, math.sqrt(2) / 2, 0)
+        r = Vector.reflect(v, n)
+        self.assertEqual(r, Vector(1, 0, 0))
+
 if __name__ == '__main__':
     unittest.main()
+    

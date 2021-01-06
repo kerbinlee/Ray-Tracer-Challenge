@@ -18,10 +18,10 @@ class TestRay(unittest.TestCase):
     # Scenario: Computing a point from a distance
     def test_compute_point(self):
         r = Ray(Point(2, 3, 4), Vector(1, 0, 0))
-        self.assertEqual(r.position(0), Point(2, 3, 4))
-        self.assertEqual(r.position(1), Point(3, 3, 4))
-        self.assertEqual(r.position(-1), Point(1, 3, 4))
-        self.assertEqual(r.position(2.5), Point(4.5, 3, 4))
+        self.assertEqual(Ray.position(r, 0), Point(2, 3, 4))
+        self.assertEqual(Ray.position(r, 1), Point(3, 3, 4))
+        self.assertEqual(Ray.position(r, -1), Point(1, 3, 4))
+        self.assertEqual(Ray.position(r, 2.5), Point(4.5, 3, 4))
 
     # Scenario: Translating a ray
     def test_translate_ray(self):

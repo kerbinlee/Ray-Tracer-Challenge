@@ -16,7 +16,7 @@ class Environment:
         self.wind = wind
 
 if __name__ == '__main__':
-    p = Projectile(Point(0, 1, 0), Vector(1, 1.8, 0).normalize() * 11.25)
+    p = Projectile(Point(0, 1, 0), Vector.normalize(Vector(1, 1.8, 0)) * 11.25)
     e = Environment(Vector(0, -0.1, 0), Vector(-0.01, 0, 0))
 
     c = Canvas(900, 500)
@@ -26,3 +26,4 @@ if __name__ == '__main__':
         c.write_pixel(round(p.position.x), round(c.height - p.position.y), Color(1, 1, 1))
 
     c.canvas_to_ppm()
+    

@@ -6,8 +6,8 @@ class Ray:
         self.origin: Point = origin
         self.direction: Vector = direction
 
-    def position(self, distance):
-        return self.origin + self.direction * distance
+    def position(ray, distance):
+        return ray.origin + ray.direction * distance
 
     def transform(ray, matrix):
         return Ray(Matrix.multiply_tuple(matrix, ray.origin), Matrix.multiply_tuple(matrix, ray.direction))
