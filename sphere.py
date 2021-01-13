@@ -11,14 +11,18 @@ import math
 class Sphere:
     def __init__(self):
         self.origin: Point = Point(0, 0, 0)
-        self.radius = 1
-        self.transform = np.identity(4)
-        self.material = Material()
+        self.radius: float = 1
+        self.transform: np.ndarray = np.identity(4)
+        self.material: Material = Material()
 
-    def intersect(self, ray: Ray):
-        sphere_to_ray = ray.origin - Point(0, 0, 0)
-        a = Vector.dot(ray.direction, ray.direction)
-        b = 2 * Vector.dot(ray.direction, sphere_to_ray)
+    def __eq__(self, other):
+        return self.origin == other.origin and self.radius == other.radius and np.array_equal(self.transform, other.transform) and self.material == other.material
+
+    def intersect(sphere: 'Sphere', ray: Ray):
+        ray2 = Ray.transform(ray, Matrix.inverse(sphere.transform))
+        sphere_to_ray = ray2.origin - Point(0, 0, 0)
+        a = Vector.dot(ray2.direction, ray2.direction)
+        b = 2 * Vector.dot(ray2.direction, sphere_to_ray)
         c = Vector.dot(sphere_to_ray, sphere_to_ray) - 1
         discriminant = b**2 - 4 * a * c
 
@@ -28,7 +32,7 @@ class Sphere:
         t1 = (-b - math.sqrt(discriminant)) / (2 * a)
         t2 = (-b + math.sqrt(discriminant)) / (2 * a)
 
-        return Intersection.intersections(Intersection(t1, self), Intersection(t2, self))
+        return Intersection.intersections(Intersection(t1, sphere), Intersection(t2, sphere))
 
     def normal_at(sphere: 'Sphere', world_point: Point) -> Tuple:
         object_point = Matrix.multiply_tuple(Matrix.inverse(sphere.transform), world_point)

@@ -1,4 +1,5 @@
 import math
+import numpy as np
 import os, sys
 import unittest
 
@@ -14,7 +15,7 @@ class TestSphere(unittest.TestCase):
     def test_ray_intersect_sphere_two_points(self):
         r = Ray(Point(0, 0, -5), Vector(0, 0, 1))
         s = Sphere()
-        xs = s.intersect(r)
+        xs = Sphere.intersect(s, r)
         self.assertEqual(len(xs), 2)
         self.assertEqual(xs[0].t, 4.0)
         self.assertEqual(xs[1].t, 6.0)
@@ -23,7 +24,7 @@ class TestSphere(unittest.TestCase):
     def test_ray_intersect_sphere_tangent(self):
         r = Ray(Point(0, 1, -5), Vector(0, 0, 1))
         s = Sphere()
-        xs = s.intersect(r)
+        xs = Sphere.intersect(s, r)
         self.assertEqual(len(xs), 2)
         self.assertEqual(xs[0].t, 5.0)
         self.assertEqual(xs[1].t, 5.0)
@@ -32,14 +33,14 @@ class TestSphere(unittest.TestCase):
     def test_ray_miss_sphere(self):
         r = Ray(Point(0, 2, -5), Vector(0, 0, 1))
         s = Sphere()
-        xs = s.intersect(r)
+        xs = Sphere.intersect(s, r)
         self.assertEqual(len(xs), 0)
         
     # Scenario: A ray originates inside a sphere
     def test_ray_originate_inside_sphere(self):
         r = Ray(Point(0, 0, 0), Vector(0, 0, 1))
         s = Sphere()
-        xs = s.intersect(r)
+        xs = Sphere.intersect(s, r)
         self.assertEqual(len(xs), 2)
         self.assertEqual(xs[0].t, -1.0)
         self.assertEqual(xs[1].t, 1.0)
@@ -48,7 +49,7 @@ class TestSphere(unittest.TestCase):
     def test_sphere_behind_ray(self):
         r = Ray(Point(0, 0, 5), Vector(0, 0, 1))
         s = Sphere()
-        xs = s.intersect(r)
+        xs = Sphere.intersect(s, r)
         self.assertEqual(len(xs), 2)
         self.assertEqual(xs[0].t, -6.0)
         self.assertEqual(xs[1].t, -4.0)
@@ -57,10 +58,40 @@ class TestSphere(unittest.TestCase):
     def test_intersect_object(self):
         r = Ray(Point(0, 0, -5), Vector(0, 0, 1))
         s = Sphere()
-        xs = s.intersect(r)
+        xs = Sphere.intersect(s, r)
         self.assertEqual(len(xs), 2)
         self.assertEqual(xs[0].object, s)
         self.assertEqual(xs[1].object, s)
+
+    # Scenario: A sphere's default transformation
+    def test_sphere_default_transformation(self):
+        s = Sphere()
+        self.assertTrue(np.array_equal(s.transform, np.identity(4)))
+
+    # Scenario: Changing a sphere's transformation
+    def test_change_sphere_transformation(self):
+        s = Sphere()
+        t = Transformations.translation(2, 3, 4)
+        s.transform = t
+        self.assertTrue(np.array_equal(s.transform, t))
+
+    # Scenario: Intersecting a scaled sphere with a ray
+    def test_intersect_scaled_sphere_with_ray(self):
+        r = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        s = Sphere()
+        s.transform = Transformations.scaling(2, 2, 2)
+        xs = Sphere.intersect(s, r)
+        self.assertEqual(len(xs), 2)
+        self.assertEqual(xs[0].t, 3)
+        self.assertEqual(xs[1].t, 7)
+
+    # Scenario: Intersecting a translated sphere with a ray
+    def test_intersect_translated_sphere(self):
+        r = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        s = Sphere()
+        s.transform = Transformations.translation(5, 0, 0)
+        xs = Sphere.intersect(s, r)
+        self.assertEqual(len(xs), 0)
 
     # Scenario: The normal on a sphere at a point on the x axis
     def test_normal_sphere_x(self):

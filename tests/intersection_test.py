@@ -2,9 +2,11 @@ import os, sys
 import unittest
 
 sys.path.append(os.path.abspath('..'))
-from tuple import *
+from computations import Computations
 from intersection import Intersection
+from ray import Ray
 from sphere import Sphere
+from tuple import *
 
 class TestIntersections(unittest.TestCase):
     # Scenario: An intersection encapsulates t and object
@@ -62,6 +64,37 @@ class TestIntersections(unittest.TestCase):
         i = Intersection.hit(xs)
         self.assertEqual(i, i4)
 
+    # Scenario: Precomputing the state of an intersection
+    def test_precompute_state_intersection(self):
+        r = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        shape = Sphere()
+        i = Intersection(4, shape)
+        comps = Computations.prepare_computations(i, r)
+        self.assertEqual(comps.t, i.t)
+        self.assertEqual(comps.object, i.object)
+        self.assertEqual(comps.point, Point(0, 0, -1))
+        self.assertEqual(comps.eyev, Vector(0, 0, -1))
+        self.assertEqual(comps.normalv, Vector(0, 0, -1))
+
+    # Scenario: The hit, when an intersection occurs on the outside
+    def test_hit_outside(self):
+        r = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        shape = Sphere()
+        i = Intersection(4, shape)
+        comps = Computations.prepare_computations(i, r)
+        self.assertFalse(comps.inside)
+
+    # Scenario: The hit, when an intersection occurs on the inside
+    def test_hit_inside(self):
+        r = Ray(Point(0, 0, 0), Vector(0, 0, 1))
+        shape = Sphere()
+        i = Intersection(1, shape)
+        comps = Computations.prepare_computations(i, r)
+        self.assertEqual(comps.point, Point(0, 0, 1))
+        self.assertEqual(comps.eyev, Vector(0, 0, -1))
+        self.assertTrue(comps.inside)
+        # normal would have been (0, 0, 1), but is inverted!
+        self.assertEqual(comps.normalv, Vector(0, 0, -1))
 
 if __name__ == '__main__':
     unittest.main()

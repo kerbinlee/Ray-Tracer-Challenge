@@ -52,7 +52,7 @@ if __name__ == '__main__':
             # shrink and skew
             # r = r.transform(Transformations.shearing(1, 0, 0, 0, 0, 0)).transform(Transformations.scaling(0.5, 1, 1))
 
-            xs = shape.intersect(r)
+            xs = Sphere.intersect(shape, r)
 
             hit = Intersection.hit(xs)
             if hit is not None:

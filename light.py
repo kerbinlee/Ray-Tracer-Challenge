@@ -7,6 +7,9 @@ class PointLight:
         self.position = position
         self.intensity = intensity
 
+    def __eq__(self, other):
+        return self.position == other.position and self.intensity == other.intensity
+
     def lighting(material: Material, light: 'PointLight', point: Point, eyev: Vector, normalv: Vector) -> Color:
         # combine the surface color with the light's color/intensity
         effective_color = material.color * light.intensity

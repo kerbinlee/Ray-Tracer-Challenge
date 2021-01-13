@@ -2,10 +2,13 @@ import math
 import os, sys
 import unittest
 
+import numpy as np
+
 sys.path.append(os.path.abspath('..'))
 from matrix import Matrix
 from tuple import *
 from transformations import Transformations
+from world import World
 
 class TestMatrices(unittest.TestCase):
     def test_multiply_translation_matrix(self):
@@ -124,6 +127,39 @@ class TestMatrices(unittest.TestCase):
         c = Transformations.translation(10, 5, 7)
         t = c.dot(b.dot(a))
         self.assertEqual(Matrix.multiply_tuple(t, p), Point(15, 0, 7))
+
+    # Scenario: The transformation matrix for the default orientation
+    def test_transformation_matrix_default_orientation(self):
+        from_point = Point(0, 0, 0)
+        to = Point(0, 0, -1)
+        up = Vector(0, 1, 0)
+        t = World.view_transform(from_point, to, up)
+        self.assertTrue(np.array_equal(t, np.identity(4)))
+
+    # Scenario: A view transformation matrix looking in positive z direction
+    def test_transformation_matrix_z(self):
+        from_point = Point(0, 0, 0)
+        to = Point(0, 0, 1)
+        up = Vector(0, 1, 0)
+        t = World.view_transform(from_point, to, up)
+        self.assertTrue(np.array_equal(t, Transformations.scaling(-1, 1, -1)))
+
+    # Scenario: The view transformation moves the world
+    def test_transformation_move_world(self):
+        from_point = Point(0, 0, 8)
+        to = Point(0, 0, 0)
+        up = Vector(0, 1, 0)
+        t = World.view_transform(from_point, to, up)
+        self.assertTrue(np.array_equal(t, Transformations.translation(0, 0, -8)))
+
+    # Scenario: An arbitrary view transformation
+    def test_arbitrary_view_transformation(self):
+        from_point = Point(1, 3, 2)
+        to = Point(4, -2, 8)
+        up = Vector(1, 1, 0)
+        t = World.view_transform(from_point, to, up)
+        t_expected = np.array([[-0.50709, 0.50709,  0.67612, -2.36643], [0.76772, 0.60609,  0.12122, -2.82843], [-0.35857, 0.59761, -0.71714, 0.00000], [0.00000, 0.00000, 0.00000, 1.00000]])
+        self.assertTrue(np.allclose(t, t_expected, atol = Constants.epsilon))
 
 if __name__ == '__main__':
     unittest.main()
