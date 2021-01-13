@@ -30,7 +30,7 @@ class TestMaterial(unittest.TestCase):
         eyev = Vector(0, 0, -1)
         normalv = Vector(0, 0, -1)
         light = PointLight(Point(0, 0, -10), Color(1, 1, 1))
-        result = PointLight.lighting(m, light, position, eyev, normalv)
+        result = PointLight.lighting(m, light, position, eyev, normalv, False)
         self.assertEqual(result, Color(1.9, 1.9, 1.9))
 
     # Scenario: Lighting with the eye between light and surface, eye offset 45°
@@ -40,7 +40,7 @@ class TestMaterial(unittest.TestCase):
         eyev = Vector(0, math.sqrt(2) / 2, -math.sqrt(2) / 2)
         normalv = Vector(0, 0, -1)
         light = PointLight(Point(0, 0, -10), Color(1, 1, 1))
-        result = PointLight.lighting(m, light, position, eyev, normalv)
+        result = PointLight.lighting(m, light, position, eyev, normalv, False)
         self.assertEqual(result, Color(1.0, 1.0, 1.0))
 
     # Scenario: Lighting with eye opposite surface, light offset 45°
@@ -50,7 +50,7 @@ class TestMaterial(unittest.TestCase):
         eyev = Vector(0, 0, -1)
         normalv = Vector(0, 0, -1)
         light = PointLight(Point(0, 10, -10), Color(1, 1, 1))
-        result = PointLight.lighting(m, light, position, eyev, normalv)
+        result = PointLight.lighting(m, light, position, eyev, normalv, False)
         self.assertEqual(result, Color(0.7364, 0.7364, 0.7364))
 
     # Scenario: Lighting with eye in the path of the reflection vector
@@ -60,7 +60,7 @@ class TestMaterial(unittest.TestCase):
         eyev = Vector(0, -math.sqrt(2) / 2, -math.sqrt(2) / 2)
         normalv = Vector(0, 0, -1)
         light = PointLight(Point(0, 10, -10), Color(1, 1, 1))
-        result = PointLight.lighting(m, light, position, eyev, normalv)
+        result = PointLight.lighting(m, light, position, eyev, normalv, False)
         self.assertEqual(result, Color(1.6364, 1.6364, 1.6364))
 
     # Scenario: Lighting with the light behind the surface
@@ -70,7 +70,18 @@ class TestMaterial(unittest.TestCase):
         eyev = Vector(0, 0, -1)
         normalv = Vector(0, 0, -1)
         light = PointLight(Point(0, 0, 10), Color(1, 1, 1))
-        result = PointLight.lighting(m, light, position, eyev, normalv)
+        result = PointLight.lighting(m, light, position, eyev, normalv, False)
+        self.assertEqual(result, Color(0.1, 0.1, 0.1))
+
+    # Scenario: Lighting with the surface in shadow
+    def test_lighting_surface_in_shadow(self):
+        m = Material()
+        position = Point(0, 0, 0)
+        eyev = Vector(0, 0, -1)
+        normalv = Vector(0, 0, -1)
+        light = PointLight(Point(0, 0, -10), Color(1, 1, 1))
+        in_shadow = True
+        result = PointLight.lighting(m, light, position, eyev, normalv, in_shadow)
         self.assertEqual(result, Color(0.1, 0.1, 0.1))
 
 if __name__ == '__main__':

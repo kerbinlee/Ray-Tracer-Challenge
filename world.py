@@ -4,7 +4,6 @@ from computations import Computations
 from color import Color
 from intersection import Intersection
 from light import PointLight
-from matrix import Matrix
 from ray import Ray
 from sphere import Sphere
 from transformations import Transformations
@@ -40,7 +39,8 @@ class World:
         return sorted(intersections, key = lambda intersection: intersection.t)
 
     def shade_hit(world: 'World', comps: Computations) -> Color:
-        return PointLight.lighting(comps.object.material, world.light, comps.point, comps.eyev, comps.normalv)
+        shadowed = World.is_shadowed(world, comps.over_point)
+        return PointLight.lighting(comps.object.material, world.light, comps.point, comps.eyev, comps.normalv, shadowed)
 
     def color_at(world: 'World', ray: Ray) -> Color:
         intersections = World.intersect_world(world, ray)
@@ -58,3 +58,16 @@ class World:
         orientation = np.array([[leftv.x, leftv.y, leftv.z, 0], [true_upv.x, true_upv.y, true_upv.z, 0], [-forwardv.x, -forwardv.y, -forwardv.z, 0], [0, 0, 0, 1]])
         return orientation.dot(Transformations.translation(-from_point.x, -from_point.y, -from_point.z))
     
+    def is_shadowed(world: 'World', point: Point) -> bool:
+        v = world.light.position - point
+        distance = v.magnitude()
+        direction = Vector.normalize(v)
+
+        r = Ray(point, direction)
+        intersections = World.intersect_world(world, r)
+
+        h = Intersection.hit(intersections)
+        if h is not None and h.t < distance:
+            return True
+        else:
+            return False

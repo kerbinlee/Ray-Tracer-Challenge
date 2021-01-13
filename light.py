@@ -10,7 +10,7 @@ class PointLight:
     def __eq__(self, other):
         return self.position == other.position and self.intensity == other.intensity
 
-    def lighting(material: Material, light: 'PointLight', point: Point, eyev: Vector, normalv: Vector) -> Color:
+    def lighting(material: Material, light: 'PointLight', point: Point, eyev: Vector, normalv: Vector, in_shadow: bool) -> Color:
         # combine the surface color with the light's color/intensity
         effective_color = material.color * light.intensity
 
@@ -20,6 +20,9 @@ class PointLight:
         # compute the ambient contribution
         ambient = effective_color * material.ambient
 
+        if in_shadow:
+            return ambient
+        
         # light_dot_normal represents the cosine of the angle between the
         # light vector and the normal vector. A negative number means the
         # light is on the other side of the surface.

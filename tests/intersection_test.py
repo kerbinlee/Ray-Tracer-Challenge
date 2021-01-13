@@ -6,6 +6,7 @@ from computations import Computations
 from intersection import Intersection
 from ray import Ray
 from sphere import Sphere
+from transformations import Transformations
 from tuple import *
 
 class TestIntersections(unittest.TestCase):
@@ -95,6 +96,16 @@ class TestIntersections(unittest.TestCase):
         self.assertTrue(comps.inside)
         # normal would have been (0, 0, 1), but is inverted!
         self.assertEqual(comps.normalv, Vector(0, 0, -1))
+
+    # Scenario: The hit should offset the point
+    def test_hit_offset_point(self):
+        r = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        shape = Sphere()
+        shape.transform = Transformations.translation(0, 0, 1)
+        i = Intersection(5, shape)
+        comps = Computations.prepare_computations(i, r)
+        self.assertLess(comps.over_point.z, -Constants.epsilon / 2)
+        self.assertGreater(comps.point.z, comps.over_point.z)
 
 if __name__ == '__main__':
     unittest.main()

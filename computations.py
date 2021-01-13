@@ -10,6 +10,7 @@ class Computations(Intersection):
         self.eyev: Vector = None
         self.normalv: Vector = None
         self.inside: bool = None
+        self.over_point: Point = None
 
     def prepare_computations(intersection: Intersection, ray: Ray) -> 'Computations':
         comps = Computations(intersection.t, intersection.object)
@@ -22,5 +23,7 @@ class Computations(Intersection):
             comps.normalv = -comps.normalv
         else:
             comps.inside = False
+
+        comps.over_point = comps.point + comps.normalv * Constants.epsilon
 
         return comps
