@@ -35,6 +35,6 @@ class Matrix:
         else:
             return True
             
-    def inverse(matrix: np.ndarray):
+    def inverse(matrix: np.ndarray) -> np.ndarray:
         return np.linalg.inv(matrix)
     

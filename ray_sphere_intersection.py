@@ -52,12 +52,12 @@ if __name__ == '__main__':
             # shrink and skew
             # r = r.transform(Transformations.shearing(1, 0, 0, 0, 0, 0)).transform(Transformations.scaling(0.5, 1, 1))
 
-            xs = Sphere.intersect(shape, r)
+            xs = shape.intersect(r)
 
             hit = Intersection.hit(xs)
             if hit is not None:
                 point = Ray.position(r, hit.t)
-                normal = Sphere.normal_at(shape, point)
+                normal = shape.normal_at(point)
                 eye = -r.direction
                 color = PointLight.lighting(hit.object.material, light, point, eye, normal, False)
                 canvas.write_pixel(x, y, color)

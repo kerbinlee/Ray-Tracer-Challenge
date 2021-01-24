@@ -1,6 +1,5 @@
 from intersection import Intersection
 from ray import Ray
-from sphere import Sphere
 from tuple import *
 
 class Computations(Intersection):
@@ -16,7 +15,7 @@ class Computations(Intersection):
         comps = Computations(intersection.t, intersection.object)
         comps.point = Ray.position(ray, comps.t)
         comps.eyev = -ray.direction
-        comps.normalv = Sphere.normal_at(comps.object, comps.point)
+        comps.normalv = comps.object.normal_at(comps.point)
 
         if Vector.dot(comps.normalv, comps.eyev) < 0:
             comps.inside = True

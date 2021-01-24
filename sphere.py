@@ -1,28 +1,26 @@
+from shape import Shape
 from intersection import Intersection
-from material import Material
-from matrix import Matrix
-from tuple import *
 from ray import Ray
-
-import numpy as np
+from shape import Shape
+from tuple import *
+from typing import Iterable
 
 import math
 
-class Sphere:
+class Sphere(Shape):
     def __init__(self):
+        super().__init__()
         self.origin: Point = Point(0, 0, 0)
         self.radius: float = 1
-        self.transform: np.ndarray = np.identity(4)
-        self.material: Material = Material()
-
+    
     def __eq__(self, other):
-        return self.origin == other.origin and self.radius == other.radius and np.array_equal(self.transform, other.transform) and self.material == other.material
+        return super().__eq__(other) and self.origin == other.origin and self.radius == other.radius
 
-    def intersect(sphere: 'Sphere', ray: Ray):
-        ray2 = Ray.transform(ray, Matrix.inverse(sphere.transform))
-        sphere_to_ray = ray2.origin - Point(0, 0, 0)
-        a = Vector.dot(ray2.direction, ray2.direction)
-        b = 2 * Vector.dot(ray2.direction, sphere_to_ray)
+    def intersect(self, ray: Ray) -> Iterable[Intersection]:
+        super().intersect(ray)
+        sphere_to_ray = self._local_ray.origin - Point(0, 0, 0)
+        a = Vector.dot(self._local_ray.direction, self._local_ray.direction)
+        b = 2 * Vector.dot(self._local_ray.direction, sphere_to_ray)
         c = Vector.dot(sphere_to_ray, sphere_to_ray) - 1
         discriminant = b**2 - 4 * a * c
 
@@ -32,11 +30,8 @@ class Sphere:
         t1 = (-b - math.sqrt(discriminant)) / (2 * a)
         t2 = (-b + math.sqrt(discriminant)) / (2 * a)
 
-        return Intersection.intersections(Intersection(t1, sphere), Intersection(t2, sphere))
+        return Intersection.intersections(Intersection(t1, self), Intersection(t2, self))
 
-    def normal_at(sphere: 'Sphere', world_point: Point) -> Tuple:
-        object_point = Matrix.multiply_tuple(Matrix.inverse(sphere.transform), world_point)
-        object_normal = object_point - Point(0, 0, 0)
-        world_normal = Matrix.multiply_tuple(Matrix.inverse(sphere.transform).transpose(), object_normal)
-        world_normal.w = 0
-        return Point.normalize(world_normal)
+    def local_normal_at(self, local_point: Point) -> Vector:
+        super().local_normal_at(local_point)
+        return Vector(local_point.x, local_point.y, local_point.z)

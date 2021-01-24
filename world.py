@@ -33,7 +33,7 @@ class World:
     def intersect_world(world: 'World', ray: Ray) -> Iterable[Intersection]:
         intersections: Iterable[Intersection] = []
         for object in world.objects:
-            object_intersections = Sphere.intersect(object, ray)
+            object_intersections = object.intersect(ray)
             intersections.extend(object_intersections)
 
         return sorted(intersections, key = lambda intersection: intersection.t)
