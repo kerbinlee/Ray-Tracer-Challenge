@@ -59,7 +59,7 @@ if __name__ == '__main__':
                 point = Ray.position(r, hit.t)
                 normal = shape.normal_at(point)
                 eye = -r.direction
-                color = PointLight.lighting(hit.object.material, light, point, eye, normal, False)
+                color = PointLight.lighting(hit.object.material, hit.object, light, point, eye, normal, False)
                 canvas.write_pixel(x, y, color)
 
     canvas.canvas_to_ppm()

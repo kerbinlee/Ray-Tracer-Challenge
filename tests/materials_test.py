@@ -5,6 +5,8 @@ sys.path.append(os.path.abspath('..'))
 from color import Color
 from light import PointLight
 from material import Material
+from pattern import Stripe
+from sphere import Sphere
 from tuple import *
 
 class TestMaterial(unittest.TestCase):
@@ -30,7 +32,7 @@ class TestMaterial(unittest.TestCase):
         eyev = Vector(0, 0, -1)
         normalv = Vector(0, 0, -1)
         light = PointLight(Point(0, 0, -10), Color(1, 1, 1))
-        result = PointLight.lighting(m, light, position, eyev, normalv, False)
+        result = PointLight.lighting(m, Sphere(), light, position, eyev, normalv, False)
         self.assertEqual(result, Color(1.9, 1.9, 1.9))
 
     # Scenario: Lighting with the eye between light and surface, eye offset 45°
@@ -40,7 +42,7 @@ class TestMaterial(unittest.TestCase):
         eyev = Vector(0, math.sqrt(2) / 2, -math.sqrt(2) / 2)
         normalv = Vector(0, 0, -1)
         light = PointLight(Point(0, 0, -10), Color(1, 1, 1))
-        result = PointLight.lighting(m, light, position, eyev, normalv, False)
+        result = PointLight.lighting(m, Sphere(), light, position, eyev, normalv, False)
         self.assertEqual(result, Color(1.0, 1.0, 1.0))
 
     # Scenario: Lighting with eye opposite surface, light offset 45°
@@ -50,7 +52,7 @@ class TestMaterial(unittest.TestCase):
         eyev = Vector(0, 0, -1)
         normalv = Vector(0, 0, -1)
         light = PointLight(Point(0, 10, -10), Color(1, 1, 1))
-        result = PointLight.lighting(m, light, position, eyev, normalv, False)
+        result = PointLight.lighting(m, Sphere(), light, position, eyev, normalv, False)
         self.assertEqual(result, Color(0.7364, 0.7364, 0.7364))
 
     # Scenario: Lighting with eye in the path of the reflection vector
@@ -60,7 +62,7 @@ class TestMaterial(unittest.TestCase):
         eyev = Vector(0, -math.sqrt(2) / 2, -math.sqrt(2) / 2)
         normalv = Vector(0, 0, -1)
         light = PointLight(Point(0, 10, -10), Color(1, 1, 1))
-        result = PointLight.lighting(m, light, position, eyev, normalv, False)
+        result = PointLight.lighting(m, Sphere(), light, position, eyev, normalv, False)
         self.assertEqual(result, Color(1.6364, 1.6364, 1.6364))
 
     # Scenario: Lighting with the light behind the surface
@@ -70,7 +72,7 @@ class TestMaterial(unittest.TestCase):
         eyev = Vector(0, 0, -1)
         normalv = Vector(0, 0, -1)
         light = PointLight(Point(0, 0, 10), Color(1, 1, 1))
-        result = PointLight.lighting(m, light, position, eyev, normalv, False)
+        result = PointLight.lighting(m, Sphere(), light, position, eyev, normalv, False)
         self.assertEqual(result, Color(0.1, 0.1, 0.1))
 
     # Scenario: Lighting with the surface in shadow
@@ -81,8 +83,23 @@ class TestMaterial(unittest.TestCase):
         normalv = Vector(0, 0, -1)
         light = PointLight(Point(0, 0, -10), Color(1, 1, 1))
         in_shadow = True
-        result = PointLight.lighting(m, light, position, eyev, normalv, in_shadow)
+        result = PointLight.lighting(m, Sphere(), light, position, eyev, normalv, in_shadow)
         self.assertEqual(result, Color(0.1, 0.1, 0.1))
+
+    # Scenario: Lighting with a pattern applied
+    def test_lighting_with_pattern(self):
+        m = Material()
+        m.pattern = Stripe(Color(1, 1, 1), Color(0, 0, 0))
+        m.ambient = 1
+        m.diffuse = 0
+        m.specular = 0
+        eyev = Vector(0, 0, -1)
+        normalv = Vector(0, 0, -1)
+        light = PointLight(Point(0, 0, -10), Color(1, 1, 1))
+        c1 = PointLight.lighting(m, Sphere(), light, Point(0.9, 0, 0), eyev, normalv, False)
+        c2 = PointLight.lighting(m, Sphere(), light, Point(1.1, 0, 0), eyev, normalv, False)
+        self.assertEqual(c1, Color(1, 1, 1))
+        self.assertEqual(c2, Color(0, 0, 0))
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,6 @@
 from color import Color
 from material import Material
+from shape import Shape
 from tuple import *
 
 class PointLight:
@@ -10,9 +11,14 @@ class PointLight:
     def __eq__(self, other):
         return self.position == other.position and self.intensity == other.intensity
 
-    def lighting(material: Material, light: 'PointLight', point: Point, eyev: Vector, normalv: Vector, in_shadow: bool) -> Color:
+    def lighting(material: Material, object: Shape, light: 'PointLight', point: Point, eyev: Vector, normalv: Vector, in_shadow: bool) -> Color:
+        if material.pattern is not None:
+            color = material.pattern.pattern_at_shape(object, point)
+        else:
+            color = material.color
+        
         # combine the surface color with the light's color/intensity
-        effective_color = material.color * light.intensity
+        effective_color = color * light.intensity
 
         # find the direction to the light source
         lightv = Vector.normalize(light.position - point)

@@ -40,7 +40,7 @@ class World:
 
     def shade_hit(world: 'World', comps: Computations) -> Color:
         shadowed = World.is_shadowed(world, comps.over_point)
-        return PointLight.lighting(comps.object.material, world.light, comps.point, comps.eyev, comps.normalv, shadowed)
+        return PointLight.lighting(comps.object.material, comps.object, world.light, comps.point, comps.eyev, comps.normalv, shadowed)
 
     def color_at(world: 'World', ray: Ray) -> Color:
         intersections = World.intersect_world(world, ray)
