@@ -1,11 +1,12 @@
 import math
+import numpy as np
 import os, sys
 import unittest
 
 sys.path.append(os.path.abspath('..'))
 from transformations import Transformations
 from tuple import *
-from sphere import Sphere
+from sphere import Sphere, GlassSphere
 from ray import Ray
 
 class TestSphere(unittest.TestCase):
@@ -123,6 +124,13 @@ class TestSphere(unittest.TestCase):
         s.transform = m
         n = s.normal_at(Point(0, math.sqrt(2) / 2, -(math.sqrt(2) / 2)))
         self.assertEqual(n, Vector(0, 0.97014, -0.24254))
+
+    # Scenario: A helper for producing a sphere with a glassy material
+    def test_sphere_glassy_material(self):
+        s = GlassSphere()
+        self.assertTrue(np.array_equal(s.transform, np.identity(4)))
+        self.assertEqual(s.material.transparency, 1.0)
+        self.assertEqual(s.material.refractive_index, 1.5)
 
 if __name__ == '__main__':
     unittest.main()

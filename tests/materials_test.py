@@ -101,5 +101,16 @@ class TestMaterial(unittest.TestCase):
         self.assertEqual(c1, Color(1, 1, 1))
         self.assertEqual(c2, Color(0, 0, 0))
 
+    # Scenario: Reflectivity for the default material
+    def test_reflectivity_default_material(self):
+        m = Material()
+        self.assertEqual(m.reflective, 0.0)
+
+    # Scenario: Transparency and Refractive Index for the default material
+    def test_transparency_refractive_index(self):
+        m = Material()
+        self.assertEqual(m.transparency, 0.0)
+        self.assertEqual(m.refractive_index, 1.0)
+
 if __name__ == '__main__':
     unittest.main()

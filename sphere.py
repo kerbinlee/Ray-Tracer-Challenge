@@ -16,11 +16,10 @@ class Sphere(Shape):
     def __eq__(self, other):
         return super().__eq__(other) and self.origin == other.origin and self.radius == other.radius
 
-    def intersect(self, ray: Ray) -> Iterable[Intersection]:
-        super().intersect(ray)
-        sphere_to_ray = self._local_ray.origin - Point(0, 0, 0)
-        a = Vector.dot(self._local_ray.direction, self._local_ray.direction)
-        b = 2 * Vector.dot(self._local_ray.direction, sphere_to_ray)
+    def local_intersect(self, ray: Ray) -> Iterable[Intersection]:
+        sphere_to_ray = ray.origin - Point(0, 0, 0)
+        a = Vector.dot(ray.direction, ray.direction)
+        b = 2 * Vector.dot(ray.direction, sphere_to_ray)
         c = Vector.dot(sphere_to_ray, sphere_to_ray) - 1
         discriminant = b**2 - 4 * a * c
 
@@ -33,5 +32,10 @@ class Sphere(Shape):
         return Intersection.intersections(Intersection(t1, self), Intersection(t2, self))
 
     def local_normal_at(self, local_point: Point) -> Vector:
-        super().local_normal_at(local_point)
         return Vector(local_point.x, local_point.y, local_point.z)
+
+class GlassSphere(Sphere):
+    def __init__(self):
+        super().__init__()
+        self.material.transparency = 1.0
+        self.material.refractive_index = 1.5

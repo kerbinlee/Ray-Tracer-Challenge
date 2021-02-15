@@ -12,7 +12,6 @@ class Shape(ABC):
     def __init__(self):
         self.material = Material()
         self.transform = np.identity(4)
-        self._local_ray = None
 
     @abstractmethod
     def __eq__(self, other):
@@ -21,16 +20,20 @@ class Shape(ABC):
     def test_shape() -> 'TestShape':
         return TestShape()
 
-    @abstractmethod
     def intersect(self, ray: Ray) -> Iterable[Intersection]:
-        self._local_ray = Ray.transform(ray, Matrix.inverse(self.transform))
+        local_ray = Ray.transform(ray, Matrix.inverse(self.transform))
+        return self.local_intersect(local_ray)
+
+    @abstractmethod
+    def local_intersect(self, ray: Ray) -> Iterable[Intersection]:
+        pass
 
     def normal_at(self, point: Point) -> Tuple:
         local_point = Matrix.multiply_tuple(Matrix.inverse(self.transform), point)
         local_normal = self.local_normal_at(local_point)
         world_normal = Matrix.multiply_tuple(Matrix.inverse(self.transform).transpose(), local_normal)
         world_normal.w = 0
-        return world_normal.normalize()
+        return Vector.normalize(world_normal)
 
     @abstractmethod
     def local_normal_at(self, local_point: Point) -> Vector:
@@ -44,9 +47,8 @@ class TestShape(Shape):
     def __eq__(self, other):
         return super().__eq__(other)
 
-    def intersect(self, ray: Ray) -> Iterable[Intersection]:
-        super().intersect(ray)
-        self.saved_ray = self._local_ray
+    def local_intersect(self, ray: Ray) -> Iterable[Intersection]:
+        self.saved_ray = ray
 
     def local_normal_at(self, local_point: Point) -> Vector:
         super().local_normal_at(local_point)

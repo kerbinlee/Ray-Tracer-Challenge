@@ -1,3 +1,4 @@
+import math
 import numpy as np
 
 from computations import Computations
@@ -38,18 +39,27 @@ class World:
 
         return sorted(intersections, key = lambda intersection: intersection.t)
 
-    def shade_hit(world: 'World', comps: Computations) -> Color:
+    def shade_hit(world: 'World', comps: Computations, remaining: int = 5) -> Color:
         shadowed = World.is_shadowed(world, comps.over_point)
-        return PointLight.lighting(comps.object.material, comps.object, world.light, comps.point, comps.eyev, comps.normalv, shadowed)
+        surface = PointLight.lighting(comps.object.material, comps.object, world.light, comps.over_point, comps.eyev, comps.normalv, shadowed)
+        reflected = World.reflected_color(world, comps, remaining)
+        refracted = World.refracted_color(world, comps, remaining)
 
-    def color_at(world: 'World', ray: Ray) -> Color:
+        material = comps.object.material
+        if material.reflective > 0 and material.transparency > 0:
+            reflectance = World.schlick(comps)
+            return surface + reflected * reflectance + refracted * (1 - reflectance)
+        else:
+            return surface + reflected + refracted
+
+    def color_at(world: 'World', ray: Ray, remaining: int = 5) -> Color:
         intersections = World.intersect_world(world, ray)
         hit = Intersection.hit(intersections)
         if hit is None:
             return Color(0, 0, 0)
         else:
             comps = Computations.prepare_computations(hit, ray)
-            return World.shade_hit(world, comps)
+            return World.shade_hit(world, comps, remaining)
 
     def view_transform(from_point: Point, to_point: Point, up: Vector) -> np.ndarray:
         forwardv = Point.normalize(to_point - from_point)
@@ -71,3 +81,48 @@ class World:
             return True
         else:
             return False
+
+    def reflected_color(world: 'World', comps: Computations, remaining: int = 5) -> Color:
+        if remaining <= 0:
+            return Color(0, 0, 0)
+
+        if comps.object.material.reflective == 0:
+            return Color(0, 0, 0)
+
+        reflect_ray = Ray(comps.over_point, comps.reflectv)
+        color = World.color_at(world, reflect_ray, remaining - 1)
+
+        return color * comps.object.material.reflective
+        
+    def refracted_color(world: 'World', comps: Computations, remaining: int = 5) -> Color:
+        if remaining <= 0:
+            return Color(0, 0, 0)
+        
+        if comps.object.material.transparency == 0:
+            return Color(0, 0, 0)
+
+        n_ratio = comps.n1 / comps.n2
+        cos_i = Vector.dot(comps.eyev, comps.normalv)
+        sin2_t = n_ratio ** 2 * (1 - cos_i ** 2)
+        if sin2_t > 1:
+            return Color(0, 0, 0)
+
+        cos_t = math.sqrt(1.0 - sin2_t)
+        direction = comps.normalv * (n_ratio * cos_i - cos_t) - comps.eyev * n_ratio
+        refract_ray = Ray(comps.under_point, direction)
+        color = World.color_at(world, refract_ray, remaining - 1) * comps.object.material.transparency
+        return color
+        
+    def schlick(comps: Computations) -> float:
+        cos = Vector.dot(comps.eyev, comps.normalv)
+        if (comps.n1 > comps.n2):
+            n = comps.n1 / comps.n2
+            sin2_t = n ** 2 * (1.0 - cos ** 2)
+            if sin2_t > 1.0:
+                return 1.0
+
+            cos_t = math.sqrt(1.0 - sin2_t)
+            cos = cos_t
+
+        r0 = ((comps.n1 - comps.n2) / (comps.n1 + comps.n2)) ** 2
+        return r0 + (1 - r0) * (1 - cos) ** 5

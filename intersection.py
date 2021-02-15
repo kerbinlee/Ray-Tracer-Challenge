@@ -2,7 +2,7 @@ from typing import Iterable
 
 class Intersection:
     def __init__(self, t, object):
-        self.t = t
+        self.t: float = t
         self.object = object
     
     def intersections(*i: Iterable['Intersection']) -> Iterable['Intersection']:
@@ -15,4 +15,7 @@ class Intersection:
                 if hit is None or intersection.t < hit.t:
                     hit = intersection
         return hit
-            
+
+    def __eq__(self, other):
+        return self.t == other.t and self.object == other.object
+                

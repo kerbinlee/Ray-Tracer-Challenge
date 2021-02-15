@@ -7,13 +7,11 @@ from typing import Iterable
 class Plane(Shape):
     def __init__(self):
         super().__init__()
-        self.origin: Point = Point(0, 0, 0)
-        self.radius: float = 1
     
     def __eq__(self, other):
-        return super().__eq__(other) and self.origin == other.origin and self.radius == other.radius
+        return super().__eq__(other)
 
-    def intersect(self, ray: Ray) -> Iterable[Intersection]:
+    def local_intersect(self, ray: Ray) -> Iterable[Intersection]:
         if abs(ray.direction.y) < Constants.epsilon:
             return []
 

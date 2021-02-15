@@ -1,3 +1,4 @@
+import math
 import os, sys
 import unittest
 
@@ -7,6 +8,8 @@ from computations import Computations
 from intersection import Intersection
 from light import PointLight
 from ray import Ray
+from pattern import Pattern
+from plane import Plane
 from sphere import Sphere
 from transformations import Transformations
 from tuple import *
@@ -130,6 +133,161 @@ class TestWorld(unittest.TestCase):
         comps = Computations.prepare_computations(i, r)
         c = World.shade_hit(w, comps)
         self.assertEqual(c, Color(0.1, 0.1, 0.1))
+  
+    # Scenario: The reflected color for a nonreflective material
+    def test_reflected_color_nonreflective_material(self):
+        w = World.default_world()
+        r = Ray(Point(0, 0, 0), Vector(0, 0, 1))
+        shape = w.objects[1]
+        shape.material.ambient = 1
+        i = Intersection(1, shape)
+        comps = Computations.prepare_computations(i, r)
+        color = World.reflected_color(w, comps)
+        self.assertEqual(color, Color(0, 0, 0))
+
+    # Scenario: The reflected color for a reflective material
+    def test_reflected_color_for_reflective_material(self):
+        w = World.default_world()
+        shape = Plane()
+        shape.material.reflective = 0.5
+        shape.transform = Transformations.translation(0, -1, 0)
+        w.objects.append(shape)
+        r = Ray(Point(0, 0, -3), Vector(0, -math.sqrt(2) / 2, math.sqrt(2) / 2))
+        i = Intersection(math.sqrt(2), shape)
+        comps = Computations.prepare_computations(i, r)
+        color = World.reflected_color(w, comps)
+        self.assertEqual(color, Color(0.19032, 0.2379, 0.14274))
+
+    # Scenario: shade_hit() with a reflective material
+    def test_shade_hit_reflective_material(self):
+        w = World.default_world()
+        shape = Plane()
+        shape.material.reflective = 0.5
+        shape.transform = Transformations.translation(0, -1, 0)
+        w.objects.append(shape)
+        r = Ray(Point(0, 0, -3), Vector(0, -math.sqrt(2) / 2, math.sqrt(2) / 2))
+        i = Intersection(math.sqrt(2), shape)
+        comps = Computations.prepare_computations(i, r)
+        color = World.shade_hit(w, comps)
+        self.assertEqual(color, Color(0.87677, 0.92436, 0.82918))
+
+    # Scenario: color_at() with mutually reflective surfaces
+    def test_color_at_with_mutually_reflective_surfaces(self):
+        w = World()
+        w.light = PointLight(Point(0, 0, 0), Color(1, 1, 1))
+        lower = Plane()
+        lower.material.reflective = 1
+        lower.transform = Transformations.translation(0, -1, 0)
+        w.objects.append(lower)
+        upper = Plane()
+        upper.material.reflective = 1
+        upper.transform = Transformations.translation(0, 1, 0)
+        w.objects.append(upper)
+        r = Ray(Point(0, 0, 0), Vector(0, 1, 0))
+        self.assertIsNotNone(World.color_at(w, r))
+
+    # Scenario: The reflected color at the maximum recursive depth
+    def test_reflected_color_at_maximum_recursive_depth(self):
+        w = World.default_world()
+        shape = Plane()
+        shape.material.reflective = 0.5
+        shape.transform = Transformations.translation(0, -1, 0)
+        w.objects.append(shape)
+        r = Ray(Point(0, 0, -3), Vector(0, -math.sqrt(2) / 2, math.sqrt(2) / 2))
+        i = Intersection(math.sqrt(2), shape)
+        comps = Computations.prepare_computations(i, r)
+        color = World.reflected_color(w, comps, 0)
+        self.assertEqual(color, Color(0, 0, 0))
+
+    # Scenario: The refracted color with an opaque surface
+    def test_refracted_color_with_opaque_surface(self):
+        w = World.default_world()
+        shape = w.objects[0]
+        r = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        xs = Intersection.intersections(Intersection(4, shape), Intersection(6, shape))
+        comps = Computations.prepare_computations(xs[0], r, xs)
+        c = World.refracted_color(w, comps, 5)
+        self.assertEqual(c, Color(0, 0, 0))
+
+    # Scenario: The refracted color at the maximum recursive depth
+    def test_refracted_color_at_max_recursive_depth(self):
+        w = World.default_world()
+        shape = w.objects[0]
+        shape.material.transparency = 1.0
+        shape.material.refractive_index = 1.5
+        r = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        xs = Intersection.intersections(Intersection(4, shape), Intersection(6, shape))
+        comps = Computations.prepare_computations(xs[0], r, xs)
+        c = World.refracted_color(w, comps, 0)
+        self.assertEqual(c, Color(0, 0, 0))
+
+    # Scenario: The refracted color under total internal reflection
+    def test_refracted_color_under_total_internal_reflection(self):
+        w = World.default_world()
+        shape = w.objects[0]
+        shape.material.transparency = 1.0
+        shape.material.refractive_index = 1.5
+        r = Ray(Point(0, 0, math.sqrt(2) / 2), Vector(0, 1, 0))
+        xs = Intersection.intersections(Intersection(-math.sqrt(2) / 2, shape), Intersection(math.sqrt(2) / 2, shape))
+        # NOTE: this time you're inside the sphere, so you need
+        # to look at the second intersection, xs[1], not xs[0]
+        comps = Computations.prepare_computations(xs[1], r, xs)
+        c = World.refracted_color(w, comps, 5)
+        self.assertEqual(c, Color(0, 0, 0))
+
+    # Scenario: The refracted color with a refracted ray
+    def test_refracted_color_with_refracted_ray(self):
+        w = World.default_world()
+        a = w.objects[0]
+        a.material.ambient = 1.0
+        a.material.pattern = Pattern.test_pattern()
+        b = w.objects[1]
+        b.material.transparency = 1.0
+        b.material.refractive_index = 1.5
+        r = Ray(Point(0, 0, 0.1), Vector(0, 1, 0))
+        xs = Intersection.intersections(Intersection(-0.9899, a), Intersection(-0.4899, b), Intersection(0.4899, b), Intersection(0.9899, a))
+        comps = Computations.prepare_computations(xs[2], r, xs)
+        c = World.refracted_color(w, comps, 5)
+        self.assertEqual(c, Color(0, 0.99888, 0.04725))
+
+    # Scenario: shade_hit() with a transparent material
+    def test_shade_hit_with_transparent_material(self):
+        w = World.default_world()
+        floor = Plane()
+        floor.transform = Transformations.translation(0, -1, 0)
+        floor.material.transparency = 0.5
+        floor.material.refractive_index = 1.5
+        w.objects.append(floor)
+        ball = Sphere()
+        ball.material.color = Color(1, 0, 0)
+        ball.material.ambient = 0.5
+        ball.transform = Transformations.translation(0, -3.5, -0.5)
+        w.objects.append(ball)
+        r = Ray(Point(0, 0, -3), Vector(0, -math.sqrt(2) / 2, math.sqrt(2) / 2))
+        xs = Intersection.intersections(Intersection(math.sqrt(2), floor))
+        comps = Computations.prepare_computations(xs[0], r, xs)
+        color = World.shade_hit(w, comps, 5)
+        self.assertEqual(color, Color(0.93642, 0.68642, 0.68642))
+
+    # Scenario: shade_hit() with a reflective, transparent material
+    def test_shade_hit_with_reflective_transparent_material(self):
+        w = World.default_world()
+        r = Ray(Point(0, 0, -3), Vector(0, -math.sqrt(2) / 2, math.sqrt(2) / 2))
+        floor = Plane()
+        floor.transform = Transformations.translation(0, -1, 0)
+        floor.material.reflective = 0.5
+        floor.material.transparency = 0.5
+        floor.material.refractive_index = 1.5
+        w.objects.append(floor)
+        ball = Sphere()
+        ball.material.color = Color(1, 0, 0)
+        ball.material.ambient = 0.5
+        ball.transform = Transformations.translation(0, -3.5, -0.5)
+        w.objects.append(ball)
+        xs = Intersection.intersections(Intersection(math.sqrt(2), floor))
+        comps = Computations.prepare_computations(xs[0], r, xs)
+        color = World.shade_hit(w, comps, 5)
+        self.assertEqual(color, Color(0.93391, 0.69643, 0.69243))
   
 if __name__ == '__main__':
     unittest.main()

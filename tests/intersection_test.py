@@ -2,12 +2,15 @@ import os, sys
 import unittest
 
 sys.path.append(os.path.abspath('..'))
+from collections import namedtuple
 from computations import Computations
 from intersection import Intersection
+from plane import Plane
 from ray import Ray
-from sphere import Sphere
+from sphere import GlassSphere, Sphere
 from transformations import Transformations
 from tuple import *
+from world import World
 
 class TestIntersections(unittest.TestCase):
     # Scenario: An intersection encapsulates t and object
@@ -106,6 +109,81 @@ class TestIntersections(unittest.TestCase):
         comps = Computations.prepare_computations(i, r)
         self.assertLess(comps.over_point.z, -Constants.epsilon / 2)
         self.assertGreater(comps.point.z, comps.over_point.z)
+
+    # Scenario: Precomputing the reflection vector
+    def test_precomputing_reflection_vector(self):
+        shape = Plane()
+        r = Ray(Point(0, 1, -1), Vector(0, -math.sqrt(2) / 2, math.sqrt(2) / 2)) 
+        i = Intersection(math.sqrt(2), shape)                      
+        comps = Computations.prepare_computations(i, r)
+        self.assertEqual(comps.reflectv, Vector(0, math.sqrt(2) / 2, math.sqrt(2) / 2))
+
+    # Scenario Outline: Finding n1 and n2 at various intersections
+    def test_findinf_n1_n2_at_various_intersections(self):
+        a = GlassSphere()
+        a.transform = Transformations.scaling(2, 2, 2)
+        a.material.refractive_index = 1.5
+        b = GlassSphere()
+        b.transform = Transformations.translation(0, 0, -0.25)
+        b.material.refractive_index = 2.0
+        c = GlassSphere()
+        c.transform = Transformations.translation(0, 0, 0.25)
+        c.material.refractive_index = 2.5
+        r = Ray(Point(0, 0, -4), Vector(0, 0, 1))
+        xs = Intersection.intersections(Intersection(2, a), Intersection(2.75, b), Intersection(3.25, c), Intersection(4.75, b), Intersection(5.25, c), Intersection(6, a))
+        RefractiveIndices = namedtuple("RefractiveIndices", ["n1", "n2"])
+        refractive_indices_list = [
+            RefractiveIndices(1.0, 1.5),
+            RefractiveIndices(1.5, 2.0),
+            RefractiveIndices(2.0, 2.5),
+            RefractiveIndices(2.5, 2.5),
+            RefractiveIndices(2.5, 1.5),
+            RefractiveIndices(1.5, 1.0)
+        ]
+        for index, refractive_index in enumerate(refractive_indices_list):
+            comps = Computations.prepare_computations(xs[index], r, xs)
+            print(comps.n1)
+            print(comps.n2)
+            self.assertEqual(comps.n1, refractive_index.n1)
+            self.assertEqual(comps.n2, refractive_index.n2)
+
+    # Scenario: The under point is offset below the surface
+    def test_under_point_offset_below_surface(self):
+        r = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        shape = GlassSphere()
+        shape.transform = Transformations.translation(0, 0, 1)
+        i = Intersection(5, shape)
+        xs = Intersection.intersections(i)
+        comps = Computations.prepare_computations(i, r, xs)
+        self.assertGreater(comps.under_point.z, Constants.epsilon / 2)
+        self.assertLess(comps.point.z, comps.under_point.z)
+
+    # Scenario: The Schlick approximation under total internal reflection
+    def test_schlick_approximation_under_total_internal_reflection(self):
+        shape = GlassSphere()
+        r = Ray(Point(0, 0, math.sqrt(2) / 2), Vector(0, 1, 0))
+        xs = Intersection.intersections(Intersection(-math.sqrt(2) / 2, shape), Intersection(math.sqrt(2) / 2, shape))
+        comps = Computations.prepare_computations(xs[1], r, xs)
+        reflectance = World.schlick(comps)
+        self.assertEqual(reflectance, 1.0)
+
+    # Scenario: The Schlick approximation with a perpendicular viewing angle
+    def test_schlick_approximation_with_perpendicular_viewing_angle(self):
+        shape = GlassSphere()
+        r = Ray(Point(0, 0, 0), Vector(0, 1, 0))
+        xs = Intersection.intersections(Intersection(-1,shape), Intersection(1, shape))
+        comps = Computations.prepare_computations(xs[1], r, xs)
+        reflectance = World.schlick(comps)
+        self.assertAlmostEqual(reflectance, 0.04, delta = Constants.epsilon)
+
+    # Scenario: The Schlick approximation with small angle and n2 > n1
+    def test_schlick_approximation_with_small_angle(self):
+        shape = GlassSphere()
+        r = Ray(Point(0, 0.99, -2), Vector(0, 0, 1))
+        xs = Intersection.intersections(Intersection(1.8589, shape))
+        comps = Computations.prepare_computations(xs[0], r, xs)
+        reflectance = World.schlick(comps)
+        self.assertAlmostEqual(reflectance, 0.48873, delta = Constants.epsilon)
 
 if __name__ == '__main__':
     unittest.main()
