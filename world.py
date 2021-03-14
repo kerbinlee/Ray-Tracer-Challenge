@@ -13,7 +13,7 @@ from typing import Iterable
 
 class World:
     def __init__(self):
-        self.objects: list[Sphere] = []
+        self.objects: Iterable[Sphere] = []
         self.light: PointLight = None
 
     def default_world():
