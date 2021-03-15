@@ -17,7 +17,7 @@ class Pattern(ABC):
         return self.a == other.a and self.b == other.b
 
     def pattern_at_shape(self, shape: Shape, world_point: Point) -> Color:
-        object_point = Matrix.multiply_tuple(Matrix.inverse(shape.transform), world_point)
+        object_point = shape.world_to_object(world_point)
         pattern_point = Matrix.multiply_tuple(Matrix.inverse(self.transform), object_point)
         return self.pattern_at(pattern_point)
 

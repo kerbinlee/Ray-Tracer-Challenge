@@ -1,8 +1,10 @@
+import math
 import numpy as np
 import os, sys
 import unittest
 
 sys.path.append(os.path.abspath('..'))
+from group import Group
 from material import Material
 from ray import Ray
 from shape import Shape
@@ -73,6 +75,50 @@ class TestShapes(unittest.TestCase):
     def test_sphere_shape(self):
         s = Sphere()
         self.assertIsInstance(s, Shape)
+
+    # Scenario: A shape has a parent attribute
+    def test_shape_has_parent_attribute(self):
+        s = Shape.test_shape()
+        self.assertIsNone(s.parent)
+
+    # Scenario: Converting a point from world to object space
+    def test_converting_point_from_world_to_object_space(self):
+        g1 = Group()
+        g1.transform = Transformations.rotation_y(math.pi / 2)
+        g2 = Group()
+        g2.transform = Transformations.scaling(2, 2, 2)
+        g1.add_child(g2)
+        s = Sphere()
+        s.transform = Transformations.translation(5, 0, 0)
+        g2.add_child(s)
+        p = s.world_to_object(Point(-2, 0, -10))
+        self.assertEqual(p, Point(0, 0, -1))
+
+    # Scenario: Converting a normal from object to world space
+    def test_converting_normal_from_object_to_world_space(self):
+        g1 = Group()
+        g1.transform = Transformations.rotation_y(math.pi / 2)
+        g2 = Group()
+        g2.transform = Transformations.scaling(1, 2, 3)
+        g1.add_child(g2)
+        s = Sphere()
+        s.transform = Transformations.translation(5, 0, 0)
+        g2.add_child(s)
+        n = s.normal_to_world(Vector(math.sqrt(3) /3, math.sqrt(3) / 3, math.sqrt(3) / 3))
+        self.assertEqual(n, Vector(0.2857, 0.4286, -0.8571))
+
+    # Scenario: Finding the normal on a child object
+    def test_finding_normal_on_child_object(self):
+        g1 = Group()
+        g1.transform = Transformations.rotation_y(math.pi / 2)
+        g2 = Group()
+        g2.transform = Transformations.scaling(1, 2, 3)
+        g1.add_child(g2)
+        s = Sphere()
+        s.transform = Transformations.translation(5, 0, 0)
+        g2.add_child(s)
+        n = s.normal_at(Point(1.7321, 1.1547, -5.5774))
+        self.assertEqual(n, Vector(0.2857, 0.4286, -0.8571))
 
 if __name__ == '__main__':
     unittest.main()

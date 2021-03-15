@@ -10,8 +10,9 @@ from typing import Iterable
 
 class Shape(ABC):
     def __init__(self):
-        self.material = Material()
-        self.transform = np.identity(4)
+        self.material: Material = Material()
+        self.transform: np.ndarray = np.identity(4)
+        self.parent: 'Shape' = None
 
     @abstractmethod
     def __eq__(self, other):
@@ -29,15 +30,29 @@ class Shape(ABC):
         pass
 
     def normal_at(self, point: Point) -> Tuple:
-        local_point = Matrix.multiply_tuple(Matrix.inverse(self.transform), point)
+        local_point = self.world_to_object(point)
         local_normal = self.local_normal_at(local_point)
-        world_normal = Matrix.multiply_tuple(Matrix.inverse(self.transform).transpose(), local_normal)
-        world_normal.w = 0
-        return Vector.normalize(world_normal)
+        return self.normal_to_world(local_normal)
 
     @abstractmethod
     def local_normal_at(self, local_point: Point) -> Vector:
         pass
+
+    def world_to_object(self, point: Point) -> Point:
+        if self.parent is not None:
+            point = self.parent.world_to_object(point)
+        
+        return Matrix.multiply_tuple(Matrix.inverse(self.transform), point)
+
+    def normal_to_world(self, normal: Vector) -> Vector:
+        normal = Matrix.multiply_tuple(Matrix.inverse(self.transform).transpose(), normal)
+        normal.w = 0
+        normal = Vector.normalize(normal)
+
+        if self.parent is not None:
+            normal = self.parent.normal_to_world(normal)
+
+        return normal
 
 class TestShape(Shape):
     saved_ray = None

@@ -1,3 +1,3 @@
 class Constants:
-    epsilon = 0.00003
+    epsilon = 0.0001
     
