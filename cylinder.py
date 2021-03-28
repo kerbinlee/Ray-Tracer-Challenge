@@ -1,3 +1,4 @@
+from bounds import Bounds
 from intersection import Intersection
 from ray import Ray
 from revolved_plane import RevolvedPlane
@@ -38,4 +39,9 @@ class Cylinder(RevolvedPlane):
 
         if Cylinder.check_cap(ray, t1, 1):
             xs.append(Intersection(t1, self))
+
+    def bounds_of(self) -> Bounds:
+        min = Point(-1, self.minimum, -1)
+        max = Point(1, self.maximum, 1)
+        return Bounds(min, max)
         

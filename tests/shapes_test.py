@@ -120,5 +120,20 @@ class TestShapes(unittest.TestCase):
         n = s.normal_at(Point(1.7321, 1.1547, -5.5774))
         self.assertEqual(n, Vector(0.2857, 0.4286, -0.8571))
 
+    # Scenario: Test shape has (arbitrary) bounds
+    def test_shape_bounding_box(self):
+        shape = Shape.test_shape()
+        box = shape.bounds_of()
+        self.assertEqual(box.min, Point(-1, -1, -1))
+        self.assertEqual(box.max, Point(1, 1, 1))
+
+    # Scenario: Querying a shape's bounding box in its parent's space
+    def test_shape_bounding_box_in_parent_space(self):
+        shape = Sphere()
+        shape.transform =Transformations.translation(1, -3, 5).dot(Transformations.scaling(0.5, 2, 4))
+        box = shape.parent_space_bounds_of()
+        self.assertEqual(box.min, Point(0.5, -5, 1))
+        self.assertEqual(box.max, Point(1.5, -1, 9))
+
 if __name__ == '__main__':
     unittest.main()

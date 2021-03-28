@@ -1,3 +1,4 @@
+import math
 import os, sys
 import unittest
 
@@ -124,5 +125,21 @@ class TestCylinders(unittest.TestCase):
             n = cyl.local_normal_at(point_normal.point)
             self.assertEqual(n, point_normal.normal)
 
+    # Scenario: An unbounded cylinder has a bounding box
+    def test_unbounded_cylinder_bounding_box(self):
+        shape = Cylinder()
+        box = shape.bounds_of()
+        self.assertEqual(box.min, Point(-1, -math.inf, -1))
+        self.assertEqual(box.max, Point(1, math.inf, 1))
+
+    # Scenario: A bounded cylinder has a bounding box
+    def test_bounded_cylinder_bounding_box(self):
+        shape = Cylinder()
+        shape.minimum = -5
+        shape.maximum = 3
+        box = shape.bounds_of()
+        self.assertEqual(box.min, Point(-1, -5, -1))
+        self.assertEqual(box.max, Point(1, 3, 1))
+        
 if __name__ == '__main__':
     unittest.main()

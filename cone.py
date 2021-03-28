@@ -1,3 +1,4 @@
+from bounds import Bounds
 from revolved_plane import RevolvedPlane
 from intersection import Intersection
 from ray import Ray
@@ -44,3 +45,11 @@ class Cone(RevolvedPlane):
 
         if Cone.check_cap(ray, t1, self.maximum):
             xs.append(Intersection(t1, self))
+
+    def bounds_of(self) -> Bounds:
+        a = abs(self.minimum)
+        b = abs(self.maximum)
+        limit = max(a, b)
+
+        return Bounds(Point(-limit, self.minimum, -limit), Point(limit, self.maximum, limit))  
+        

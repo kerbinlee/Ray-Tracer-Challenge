@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from bounds import Bounds
 from intersection import Intersection
 from ray import Ray
 from shape import Shape
@@ -87,3 +88,8 @@ class RevolvedPlane(Shape):
             xs.append(Intersection(t1, self))
 
         return xs
+
+    @abstractmethod
+    def bounds_of(self) -> Bounds:
+        pass
+        

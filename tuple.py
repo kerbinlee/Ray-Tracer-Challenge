@@ -9,7 +9,7 @@ class Tuple:
         self.w = w
 
     def __eq__(self, other):
-        return abs(self.x - other.x) < Constants.epsilon and abs(self.y - other.y) < Constants.epsilon and abs(self.z - other.z) < Constants.epsilon and abs(self.w - other.w) < Constants.epsilon
+        return math.isclose(self.x, other.x, abs_tol = Constants.epsilon) and math.isclose(self.y, other.y, abs_tol = Constants.epsilon) and math.isclose(self.z, other.z, abs_tol = Constants.epsilon) and math.isclose(self.w, other.w, abs_tol = Constants.epsilon)
 
     def __add__(self, other):
         return Tuple(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)

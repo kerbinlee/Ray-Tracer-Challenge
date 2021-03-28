@@ -1,14 +1,10 @@
-import numpy as np
+import math
 import os, sys
 import unittest
 
 sys.path.append(os.path.abspath('..'))
-from material import Material
 from plane import Plane
 from ray import Ray
-from shape import Shape
-from sphere import Sphere
-from transformations import Transformations
 from tuple import *
 
 class TestPlanes(unittest.TestCase):
@@ -53,4 +49,14 @@ class TestPlanes(unittest.TestCase):
         self.assertEqual(len(xs), 1)
         self.assertEqual(xs[0].t, 1)
         self.assertEqual(xs[0].object, p)
+    
+    # Scenario: A plane has a bounding box
+    def test_plane_bounding_box(self):
+        shape = Plane()
+        box = shape.bounds_of()
+        self.assertEqual(box.min, Point(-math.inf, 0, -math.inf))
+        self.assertEqual(box.max, Point(math.inf, 0, math.inf))
+    
+if __name__ == '__main__':
+    unittest.main()
     

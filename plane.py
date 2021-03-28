@@ -1,3 +1,6 @@
+import math
+
+from bounds import Bounds
 from intersection import Intersection
 from ray import Ray
 from shape import Shape
@@ -20,3 +23,8 @@ class Plane(Shape):
 
     def local_normal_at(self, local_point: Point = None) -> Vector:
         return Vector(0, 1, 0)
+
+    def bounds_of(self) -> Bounds:
+        min = Point(-math.inf, 0, -math.inf)
+        max = Point(math.inf, 0, math.inf)
+        return Bounds(min, max)

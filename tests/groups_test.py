@@ -3,6 +3,7 @@ import os, sys
 import unittest
 
 sys.path.append(os.path.abspath('..'))
+from cylinder import Cylinder
 from group import Group
 from ray import Ray
 from shape import Shape
@@ -66,6 +67,39 @@ class TestGroups(unittest.TestCase):
     def test_local_normal_at_exception(self):
         g = Group()
         self.assertRaises(Exception, g.local_normal_at)
+
+    # Scenario: A group has a bounding box that contains its children
+    def test_group_bounding_box_contains_children(self):
+        s = Sphere()
+        s.transform = Transformations.translation(2, 5, -3).dot(Transformations.scaling(2, 2, 2))
+        c = Cylinder()
+        c.minimum = -2
+        c.maximum = 2
+        c.transform = Transformations.translation(-4, -1, 4).dot(Transformations.scaling(0.5, 1, 0.5))
+        shape = Group()
+        shape.add_child(s)
+        shape.add_child(c)
+        box = shape.bounds_of()
+        self.assertEqual(box.min, Point(-4.5, -3, -5))
+        self.assertEqual(box.max, Point(4, 7, 4.5))
+
+    # Scenario: Intersecting ray+group doesn't test children if box is missed
+    def test_group_missed_boudning_box(self):
+        child = Shape.test_shape()
+        shape = Group()
+        shape.add_child(child)
+        r = Ray(Point(0, 0, -5), Vector(0, 1, 0))
+        xs = shape.intersect(r)
+        self.assertIsNone(child.saved_ray)
+
+    # Scenario: Intersecting ray+group tests children if box is hit
+    def test_group_hit_bounding_box(self):
+        child = Shape.test_shape()
+        shape = Group()
+        shape.add_child(child)
+        r = Ray(Point(0, 0, -5), Vector(0, 0, 1))
+        xs = shape.intersect(r)
+        self.assertIsNotNone(child.saved_ray)
 
 if __name__ == '__main__':
     unittest.main()

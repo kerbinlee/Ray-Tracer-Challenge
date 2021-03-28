@@ -132,5 +132,12 @@ class TestSphere(unittest.TestCase):
         self.assertEqual(s.material.transparency, 1.0)
         self.assertEqual(s.material.refractive_index, 1.5)
 
+    # Scenario: A sphere has a bounding box
+    def test_sphere_bounding_box(self):
+        shape = Sphere()
+        box = shape.bounds_of()
+        self.assertEqual(box.min, Point(-1, -1, -1))
+        self.assertEqual(box.max, Point(1, 1, 1))
+
 if __name__ == '__main__':
     unittest.main()

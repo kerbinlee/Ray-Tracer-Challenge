@@ -63,5 +63,13 @@ class TestCubes(unittest.TestCase):
             normal = c.local_normal_at(p)
             self.assertEqual(normal, point_normal.normal)
 
+    # Scenario: A cube has a bounding box
+    def test_cube_bounding_box(self):
+        shape = Cube()
+        box = shape.bounds_of()
+        self.assertEqual(box.min, Point(-1, -1, -1))
+        self.assertEqual(box.max, Point(1, 1, 1))
+
 if __name__ == '__main__':
     unittest.main()
+    

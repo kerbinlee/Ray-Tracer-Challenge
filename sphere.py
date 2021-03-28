@@ -1,3 +1,4 @@
+from bounds import Bounds
 from shape import Shape
 from intersection import Intersection
 from ray import Ray
@@ -33,6 +34,11 @@ class Sphere(Shape):
 
     def local_normal_at(self, local_point: Point) -> Vector:
         return Vector(local_point.x, local_point.y, local_point.z)
+
+    def bounds_of(self) -> Bounds:
+        min = Point(-self.radius, -self.radius, -self.radius)
+        max = Point(self.radius, self.radius, self.radius)
+        return Bounds(min, max)
 
 class GlassSphere(Sphere):
     def __init__(self):

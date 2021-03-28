@@ -1,3 +1,4 @@
+from bounds import Bounds
 from intersection import Intersection
 from ray import Ray
 from shape import Shape
@@ -33,9 +34,9 @@ class Cube(Shape):
             return Vector(0, local_point.y, 0)
         return Vector(0, 0, local_point.z)
 
-    def check_axis(origin: float, direction: float) -> PythonTuple[float, float]:
-        tmin_numerator = (-1 - origin)
-        tmax_numerator = (1 - origin)
+    def check_axis(origin: float, direction: float, min_axis_value: float = -1, max_axis_value: float = 1) -> PythonTuple[float, float]:
+        tmin_numerator = (min_axis_value - origin)
+        tmax_numerator = (max_axis_value - origin)
 
         if abs(direction) >= Constants.epsilon:
             tmin = tmin_numerator / direction
@@ -48,3 +49,9 @@ class Cube(Shape):
             tmin, tmax = tmax, tmin
 
         return tmin, tmax
+
+    def bounds_of(self) -> Bounds:
+        min = Point(-1, -1, -1)
+        max = Point(1, 1, 1)
+        return Bounds(min, max)
+        

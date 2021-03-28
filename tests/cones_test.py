@@ -65,5 +65,21 @@ class TestCones(unittest.TestCase):
             n = shape.local_normal_at(point_normal.point)
             self.assertEqual(n, point_normal.normal)
 
+    # Scenario: An unbounded cone has a bounding box
+    def test_unbounded_cone_bounding_box(self):
+        shape = Cone()
+        box = shape.bounds_of()
+        self.assertEqual(box.min, Point(-math.inf, -math.inf, -math.inf))
+        self.assertEqual(box.max, Point(math.inf, math.inf, math.inf))
+
+    # Scenario: A bounded cone has a bounding box
+    def test_bounded_cone_bounding_box(self):
+        shape = Cone()
+        shape.minimum = -5
+        shape.maximum = 3
+        box = shape.bounds_of()
+        self.assertEqual(box.min, Point(-5, -5, -5))
+        self.assertEqual(box.max, Point(5, 3, 5))
+
 if __name__ == '__main__':
     unittest.main()

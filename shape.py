@@ -1,6 +1,7 @@
 import numpy as np
 
 from abc import ABC, abstractmethod
+from bounds import Bounds
 from intersection import Intersection
 from material import Material
 from matrix import Matrix
@@ -54,18 +55,32 @@ class Shape(ABC):
 
         return normal
 
+    # calculate untransformed bounds of a given shape
+    @abstractmethod
+    def bounds_of(self) -> Bounds:
+        pass
+
+    def parent_space_bounds_of(self)-> Bounds:
+        return self.bounds_of().transform(self.transform)
+
 class TestShape(Shape):
-    saved_ray = None
     def __init__(self):
         super().__init__()
+        self.saved_ray = None
 
     def __eq__(self, other):
         return super().__eq__(other)
 
     def local_intersect(self, ray: Ray) -> Iterable[Intersection]:
         self.saved_ray = ray
+        return []
 
     def local_normal_at(self, local_point: Point) -> Vector:
         super().local_normal_at(local_point)
         return Vector(local_point.x, local_point.y, local_point.z)
+
+    def bounds_of(self) -> Bounds:
+        min = Point(-1, -1, -1)
+        max = Point(1, 1, 1)
+        return Bounds(min, max)
         
