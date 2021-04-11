@@ -9,6 +9,7 @@ from plane import Plane
 from ray import Ray
 from sphere import GlassSphere, Sphere
 from transformations import Transformations
+from triangle import Triangle
 from tuple import *
 from world import World
 
@@ -184,6 +185,13 @@ class TestIntersections(unittest.TestCase):
         comps = Computations.prepare_computations(xs[0], r, xs)
         reflectance = World.schlick(comps)
         self.assertAlmostEqual(reflectance, 0.48873, delta = Constants.epsilon)
+
+    # Scenario: An intersection can encapsulate `u` and `v`
+    def test_intersection_u_v(self):
+        s = Triangle(Point(0, 1, 0), Point(-1, 0, 0), Point(1, 0, 0))
+        i = Intersection(3.5, s, 0.2, 0.4)
+        self.assertEqual(i.u, 0.2)
+        self.assertEqual(i.v, 0.4)
 
 if __name__ == '__main__':
     unittest.main()

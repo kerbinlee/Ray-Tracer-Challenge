@@ -21,7 +21,7 @@ class Plane(Shape):
         t = -ray.origin.y / ray.direction.y
         return [Intersection(t, self)]
 
-    def local_normal_at(self, local_point: Point = None) -> Vector:
+    def local_normal_at(self, local_point: Point = None, intersection: Intersection = None) -> Vector:
         return Vector(0, 1, 0)
 
     def bounds_of(self) -> Bounds:

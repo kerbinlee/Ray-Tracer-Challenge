@@ -22,7 +22,7 @@ class RevolvedPlane(Shape):
     def local_intersect(self, ray: Ray) -> Iterable[Intersection]:
         pass
 
-    def local_normal_at(self, local_point: Point = None) -> Vector:
+    def local_normal_at(self, local_point: Point = None, intersection: Intersection = None) -> Vector:
         # compute the square of the distance from the y axis
         dist = local_point.x ** 2 + local_point.z ** 2
 

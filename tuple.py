@@ -37,6 +37,14 @@ class Tuple:
         return Tuple(tuple.x / magnitude, tuple.y / magnitude, tuple.z / magnitude, tuple.w / magnitude)
 
     # TODO: should this be in Vector?
+    def cross(self, other):
+        return Vector(self.y * other.z - self.z * other.y, self.z * other.x - self.x * other.z, self.x * other.y - self.y * other.x)
+
+    # TODO: should this be in Vector?
+    def reflect(in_vector: 'Tuple', normal: 'Tuple') -> 'Tuple':
+        return  in_vector - normal * 2 * Tuple.dot(in_vector, normal)
+
+    # TODO: should this be in Vector?
     def dot(a: 'Tuple', b: 'Tuple') -> float:
         return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
 
@@ -47,12 +55,9 @@ class Point(Tuple):
     def __init__(self, x, y, z):
         super().__init__(x, y, z, 1)
 
+    def __sub__(self, other):
+        return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
+
 class Vector(Tuple):
     def __init__(self, x, y, z):
         super().__init__(x, y, z, 0)
-
-    def cross(self, other):
-        return Vector(self.y * other.z - self.z * other.y, self.z * other.x - self.x * other.z, self.x * other.y - self.y * other.x)
-
-    def reflect(in_vector: 'Vector', normal: 'Vector') -> 'Vector':
-        return  in_vector - normal * 2 * Vector.dot(in_vector, normal)

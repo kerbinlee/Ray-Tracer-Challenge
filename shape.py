@@ -30,13 +30,13 @@ class Shape(ABC):
     def local_intersect(self, ray: Ray) -> Iterable[Intersection]:
         pass
 
-    def normal_at(self, point: Point) -> Tuple:
+    def normal_at(self, point: Point, intersection: Intersection = None) -> Tuple:
         local_point = self.world_to_object(point)
-        local_normal = self.local_normal_at(local_point)
+        local_normal = self.local_normal_at(local_point, intersection)
         return self.normal_to_world(local_normal)
 
     @abstractmethod
-    def local_normal_at(self, local_point: Point) -> Vector:
+    def local_normal_at(self, local_point: Point, intersection: Intersection) -> Vector:
         pass
 
     def world_to_object(self, point: Point) -> Point:

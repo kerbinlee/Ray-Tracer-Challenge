@@ -25,7 +25,7 @@ class Cube(Shape):
         
         return [Intersection(tmin, self), Intersection(tmax, self)]
 
-    def local_normal_at(self, local_point: Point = None) -> Vector:
+    def local_normal_at(self, local_point: Point = None, intersection: Intersection = None) -> Vector:
         maxc = max([abs(local_point.x), abs(local_point.y), abs(local_point.z)])
 
         if maxc == abs(local_point.x):

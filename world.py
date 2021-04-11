@@ -62,7 +62,7 @@ class World:
             return World.shade_hit(world, comps, remaining)
 
     def view_transform(from_point: Point, to_point: Point, up: Vector) -> np.ndarray:
-        forwardv = Point.normalize(to_point - from_point)
+        forwardv = Vector.normalize(to_point - from_point)
         leftv = Vector.cross(forwardv, Vector.normalize(up))
         true_upv = Vector.cross(leftv, forwardv)
         orientation = np.array([[leftv.x, leftv.y, leftv.z, 0], [true_upv.x, true_upv.y, true_upv.z, 0], [-forwardv.x, -forwardv.y, -forwardv.z, 0], [0, 0, 0, 1]])

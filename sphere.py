@@ -32,7 +32,7 @@ class Sphere(Shape):
 
         return Intersection.intersections(Intersection(t1, self), Intersection(t2, self))
 
-    def local_normal_at(self, local_point: Point) -> Vector:
+    def local_normal_at(self, local_point: Point, intersection: Intersection = None) -> Vector:
         return Vector(local_point.x, local_point.y, local_point.z)
 
     def bounds_of(self) -> Bounds:

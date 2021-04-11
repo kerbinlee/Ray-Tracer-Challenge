@@ -4,7 +4,7 @@ import numpy as np
 from canvas import Canvas
 from matrix import Matrix
 from ray import Ray
-from tuple import Point, Tuple
+from tuple import Point, Vector
 from world import World
 
 class Camera:
@@ -41,7 +41,7 @@ class Camera:
         # (remember that the canvas is at z=-1)
         pixel = Matrix.multiply_tuple(Matrix.inverse(camera.transform), Point(world_x, world_y, -1))
         origin = Matrix.multiply_tuple(Matrix.inverse(camera.transform), Point(0, 0, 0))
-        direction = Tuple.normalize(pixel - origin)
+        direction = Vector.normalize(pixel - origin)
 
         return Ray(origin, direction)
 

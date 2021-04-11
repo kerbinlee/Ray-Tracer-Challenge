@@ -1,9 +1,11 @@
 from typing import Iterable
 
 class Intersection:
-    def __init__(self, t, object):
+    def __init__(self, t: float, object, u: float = None, v: float = None):
         self.t: float = t
         self.object = object
+        self.u: float = u
+        self.v: float = v
     
     def intersections(*i: Iterable['Intersection']) -> Iterable['Intersection']:
         return i

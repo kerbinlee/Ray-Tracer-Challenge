@@ -21,7 +21,7 @@ class Computations(Intersection):
         comps = Computations(intersection.t, intersection.object)
         comps.point = Ray.position(ray, comps.t)
         comps.eyev = -ray.direction
-        comps.normalv = comps.object.normal_at(comps.point)
+        comps.normalv = comps.object.normal_at(comps.point, intersection)
 
         if Vector.dot(comps.normalv, comps.eyev) < 0:
             comps.inside = True
