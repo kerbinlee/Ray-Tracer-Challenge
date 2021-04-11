@@ -43,7 +43,9 @@ class Triangle(Shape):
         return self.normal
 
     def bounds_of(self) -> Bounds:
-        min = Point(-1, -1, -1)
-        max = Point(1, 1, 1)
-        return Bounds(min, max)
+        box = Bounds()
+        box.add_point(self.p1)
+        box.add_point(self.p2)
+        box.add_point(self.p3)
+        return box
         

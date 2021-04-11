@@ -66,6 +66,16 @@ class TestTriangles(unittest.TestCase):
         self.assertEqual(len(xs), 1)
         self.assertEqual(xs[0].t, 2)
 
+    # Scenario: A triangle has a bounding box
+    def test_triangle_bounding_box(self):
+        p1 = Point(-3, 7, 2)
+        p2 = Point(6, 2, -4)
+        p3 = Point(2, -1, -1)
+        shape = Triangle(p1, p2, p3)
+        box = shape.bounds_of()
+        self.assertEqual(box.min, Point(-3, -1, -4))
+        self.assertEqual(box.max, Point(6, 7, 2))
+
 if __name__ == '__main__':
     unittest.main()
     
