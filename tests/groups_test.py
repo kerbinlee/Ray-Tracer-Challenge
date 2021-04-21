@@ -101,6 +101,74 @@ class TestGroups(unittest.TestCase):
         xs = shape.intersect(r)
         self.assertIsNotNone(child.saved_ray)
 
+    # Scenario: Partitioning a group's children
+    def test_partitioning_group_children(self):
+        s1 = Sphere()
+        s1.transform = Transformations.translation(-2, 0, 0)
+        s2 = Sphere()
+        s2.transform = Transformations.translation(2, 0, 0)
+        s3 = Sphere()
+        g = Group()
+        g.add_child(s1)
+        g.add_child(s2)
+        g.add_child(s3)
+        (left, right) = g.partition_children()
+        self.assertEqual(g.members, [s3])
+        self.assertEqual(left, [s1])
+        self.assertEqual(right, [s2])
+
+    # Scenario: Creating a sub-group from a list of children
+    def test_create_subgroup_from_children(self):
+        s1 = Sphere()
+        s2 = Sphere()
+        g = Group()
+        g.make_subgroup([s1, s2])
+        self.assertEqual(len(g.members), 1)
+        self.assertEqual(g.members[0].members, [s1, s2])
+
+    # Scenario: Subdividing a group partitions its children
+    def test_group_partitions_children(self):
+        s1 = Sphere()
+        s1.transform = Transformations.translation(-2, -2, 0)
+        s2 = Sphere()
+        s2.transform = Transformations.translation(-2, 2, 0)
+        s3 = Sphere()
+        s3.transform = Transformations.scaling(4, 4, 4)
+        g = Group()
+        g.add_child(s1)
+        g.add_child(s2)
+        g.add_child(s3)
+        g.divide(1)
+        self.assertEqual(g.members[0], s3)
+        subgroup = g.members[1]
+        self.assertIsInstance(subgroup, Group)
+        self.assertEqual(len(subgroup.members), 2)
+        self.assertEqual(subgroup.members[0].members, [s1])
+        self.assertEqual(subgroup.members[1].members, [s2])
+
+    # Scenario: Subdividing a group with too few children
+    def test_subdividing_group_too_few_children(self):
+        s1 = Sphere()
+        s1.transform = Transformations.translation(-2, 0, 0)
+        s2 = Sphere()
+        s2.transform = Transformations.translation(2, 1, 0)
+        s3 = Sphere()
+        s3.transform = Transformations.translation(2, -1, 0)
+        subgroup = Group()
+        subgroup.add_child(s1)
+        subgroup.add_child(s2)
+        subgroup.add_child(s3)
+        s4 = Sphere()
+        g = Group()
+        g.add_child(subgroup)
+        g.add_child(s4)
+        g.divide(3)
+        self.assertEqual(g.members[0], subgroup)
+        self.assertEqual(g.members[1], s4)
+        self.assertEqual(len(subgroup.members), 2)
+        self.assertEqual(subgroup.members[0].members, [s1])
+        self.assertEqual(subgroup.members[1].members, [s2, s3])
+
 if __name__ == '__main__':
     unittest.main()
     

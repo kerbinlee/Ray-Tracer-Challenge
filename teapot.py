@@ -11,14 +11,16 @@ if __name__ == '__main__':
     teapot.material.ambient = .3
     teapot.material.color = Color(.75, .1, .1)
 
+    teapot.divide(1)
+
     # The light source is white, shining from above and to the left
     world = World()
     world.objects = [teapot]
     world.light = PointLight(Point(-5, 30, 25), Color(1, 1, 1))
 
     # Camera
-    # camera = Camera(200, 150, math.pi / 3)
-    camera = Camera(50, 50, math.pi / 3)
+    camera = Camera(200, 150, math.pi / 3)
+    # camera = Camera(50, 50, math.pi / 3)
     camera.transform = World.view_transform(Point(0, 30, 25), Point(0, 0, 0), Vector(0, 0, 1))
 
     # render the result to a canvas

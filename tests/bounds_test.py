@@ -129,6 +129,42 @@ class TestBoundingBoxes(unittest.TestCase):
             r = Ray(ray_result.origin, direction)
             self.assertEqual(box.intersects(r), ray_result.result)
 
+    # Scenario: Splitting a perfect cube
+    def test_splitting_perfect_cube(self):
+        box = Bounds(Point(-1, -4, -5), Point(9, 6, 5))
+        (left, right) = Bounds.split_bounds(box)
+        self.assertEqual(left.min, Point(-1, -4, -5))
+        self.assertEqual(left.max, Point(4, 6, 5))
+        self.assertEqual(right.min, Point(4, -4, -5))
+        self.assertEqual(right.max, Point(9, 6, 5))
+
+    # Scenario: Splitting an x-wide box
+    def test_splitting_x_wide_box(self):
+        box = Bounds(Point(-1, -2, -3), Point(9, 5.5, 3))
+        (left, right) = Bounds.split_bounds(box)
+        self.assertEqual(left.min, Point(-1, -2, -3))
+        self.assertEqual(left.max, Point(4, 5.5, 3))
+        self.assertEqual(right.min, Point(4, -2, -3))
+        self.assertEqual(right.max, Point(9, 5.5, 3))
+
+    # Scenario: Splitting a y-wide box
+    def test_splitting_y_wide_box(self):
+        box = Bounds(Point(-1, -2, -3), Point(5, 8, 3))
+        (left, right) = Bounds.split_bounds(box)
+        self.assertEqual(left.min, Point(-1, -2, -3))
+        self.assertEqual(left.max, Point(5, 3, 3))
+        self.assertEqual(right.min, Point(-1, 3, -3))
+        self.assertEqual(right.max, Point(5, 8, 3))
+
+    # Scenario: Splitting a z-wide box
+    def test_splitting_z_wide_box(self):
+        box = Bounds(Point(-1, -2, -3), Point(5, 3, 7))
+        (left, right) = Bounds.split_bounds(box)
+        self.assertEqual(left.min, Point(-1, -2, -3))
+        self.assertEqual(left.max, Point(5, 3, 2))
+        self.assertEqual(right.min, Point(-1, -2, 2))
+        self.assertEqual(right.max, Point(5, 3, 7))
+
 if __name__ == '__main__':
     unittest.main()
     

@@ -61,7 +61,7 @@ class TestShapes(unittest.TestCase):
         s = Shape.test_shape()
         s.transform = Transformations.translation(0, 1, 0)
         n = s.normal_at(Point(0, 1.70711, -0.70711))
-        n = Vector(0, 0.70711, -0.70711)
+        self.assertEqual(n, Vector(0, 0.70711, -0.70711))
 
     # Scenario: Computing the normal on a transformed shape
     def test_normal_transformed_shape(self):
@@ -69,7 +69,7 @@ class TestShapes(unittest.TestCase):
         m = Transformations.scaling(1, 0.5, 1).dot(Transformations.rotation_z(math.pi / 5))
         s.transform = m
         n = s.normal_at(Point(0, math.sqrt(2) / 2, -math.sqrt(2) / 2))
-        n = Vector(0, 0.97014, -0.24254)
+        self.assertEqual(n, Vector(0, 0.97014, -0.24254))
 
     # Scenario: Test Sphere is a Shape
     def test_sphere_shape(self):
@@ -134,6 +134,12 @@ class TestShapes(unittest.TestCase):
         box = shape.parent_space_bounds_of()
         self.assertEqual(box.min, Point(0.5, -5, 1))
         self.assertEqual(box.max, Point(1.5, -1, 9))
+
+    # Scenario: Subdividing a primitive does nothing
+    def test_subdividing_primitive(self):
+        shape = Sphere()
+        shape.divide(1)
+        self.assertIsInstance(shape, Sphere)
 
 if __name__ == '__main__':
     unittest.main()

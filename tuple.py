@@ -12,19 +12,27 @@ class Tuple:
         return math.isclose(self.x, other.x, abs_tol = Constants.epsilon) and math.isclose(self.y, other.y, abs_tol = Constants.epsilon) and math.isclose(self.z, other.z, abs_tol = Constants.epsilon) and math.isclose(self.w, other.w, abs_tol = Constants.epsilon)
 
     def __add__(self, other):
-        return Tuple(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
+        return Tuple.math_type(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
 
     def __sub__(self, other):
-        return Tuple(self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w)
+        return Tuple.math_type(self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w)
 
     def __mul__(self, other):
-        return Tuple(self.x * other, self.y * other, self.z * other, self.w * other)
+        return Tuple.math_type(self.x * other, self.y * other, self.z * other, self.w * other)
 
     def __truediv__(self, divisor):
-        return Tuple(self.x / divisor, self.y / divisor, self.z / divisor, self.w / divisor)
+        return Tuple.math_type(self.x / divisor, self.y / divisor, self.z / divisor, self.w / divisor)
 
     def __neg__(self):
         return self * -1
+
+    def math_type(x, y, z, w):
+        if w == 0:
+            return Vector(x, y, z)
+        elif w == 1:
+            return Point(x, y, z)
+        else:
+            return Tuple(x, y, z, w)
 
     # TODO: should this be in Vector?
     def magnitude(self):
@@ -55,8 +63,6 @@ class Point(Tuple):
     def __init__(self, x, y, z):
         super().__init__(x, y, z, 1)
 
-    def __sub__(self, other):
-        return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
 
 class Vector(Tuple):
     def __init__(self, x, y, z):

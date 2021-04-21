@@ -3,15 +3,15 @@ from intersection import Intersection
 from ray import Ray
 from shape import Shape
 from tuple import *
-from typing import Iterable
+from typing import Iterable, List
 
 class Group(Shape):
     def __init__(self):
         super().__init__()
-        self.members: Iterable[Shape] = []
+        self.members: List[Shape] = []
     
     def __eq__(self, other):
-        return super().__eq__(other)
+        return super().__eq__(other) and self.members == other.members
 
     def local_intersect(self, ray: Ray) -> Iterable[Intersection]:
         bounds = self.bounds_of()
@@ -38,3 +38,51 @@ class Group(Shape):
             box.add_box(cbox)
 
         return box
+
+    def divide(self, threshold):
+        if threshold <= len(self.members):
+            (left, right) = self.partition_children()
+            if len(left) != 0:
+                self.make_subgroup([left])
+                self.make_subgroup([right])
+
+        for child in self.members:
+            child.divide(threshold)
+
+    def partition_children(self) -> Tuple:
+        bounding_box = self.bounds_of()
+        (left_box, right_box) = bounding_box.split_bounds()
+        left_group_members = []
+        right_group_members = []
+        other_members = []
+        for member in list(self.members):
+            member_bounds = member.parent_space_bounds_of()
+            if left_box.box_contains_box(member_bounds) and right_box.box_contains_box(member_bounds):
+                other_members.append(member)
+            elif left_box.box_contains_box(member_bounds):
+                left_group_members.append(member)
+            elif right_box.box_contains_box(member_bounds):
+                right_group_members.append(member)
+            else:
+                other_members.append(member)
+        self.members = other_members
+        return (left_group_members, right_group_members)
+
+    def make_subgroup(self, subgroup_members: List[Shape]) -> None:
+        if len(subgroup_members) > 0:
+            subgroup = Group()
+            for member in subgroup_members:
+                subgroup.add_child(member)
+
+            self.add_child(subgroup)
+
+    def divide(self, threshold: int) -> None:
+        if threshold <= len(self.members):
+            (left, right) = self.partition_children()
+            if len(left) != 0:
+                self.make_subgroup(left)
+            if len(right) != 0:
+                self.make_subgroup(right)
+
+        for child in self.members:
+            child.divide(threshold)

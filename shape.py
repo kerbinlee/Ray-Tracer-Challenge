@@ -36,7 +36,7 @@ class Shape(ABC):
         return self.normal_to_world(local_normal)
 
     @abstractmethod
-    def local_normal_at(self, local_point: Point, intersection: Intersection) -> Vector:
+    def local_normal_at(self, local_point: Point, intersection: Intersection = None) -> Vector:
         pass
 
     def world_to_object(self, point: Point) -> Point:
@@ -63,6 +63,9 @@ class Shape(ABC):
     def parent_space_bounds_of(self)-> Bounds:
         return self.bounds_of().transform(self.transform)
 
+    def divide(self, threshold: int) -> None:
+        pass
+
 class TestShape(Shape):
     def __init__(self):
         super().__init__()
@@ -75,7 +78,7 @@ class TestShape(Shape):
         self.saved_ray = ray
         return []
 
-    def local_normal_at(self, local_point: Point) -> Vector:
+    def local_normal_at(self, local_point: Point, intersection: Intersection = None) -> Vector:
         super().local_normal_at(local_point)
         return Vector(local_point.x, local_point.y, local_point.z)
 
