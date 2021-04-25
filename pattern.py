@@ -14,7 +14,7 @@ class Pattern(ABC):
         self.transform: np.ndarray = np.identity(4)
     
     def __eq__(self, other):
-        return self.a == other.a and self.b == other.b
+        return self.a == other.a and self.b == other.b and np.array_equal(self.transform, other.transform)
 
     def pattern_at_shape(self, shape: Shape, world_point: Point) -> Color:
         object_point = shape.world_to_object(world_point)

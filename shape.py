@@ -7,7 +7,7 @@ from material import Material
 from matrix import Matrix
 from ray import Ray
 from tuple import *
-from typing import Iterable
+from typing import Iterable, List
 
 class Shape(ABC):
     def __init__(self):
@@ -17,12 +17,12 @@ class Shape(ABC):
 
     @abstractmethod
     def __eq__(self, other):
-        return np.array_equal(self.transform, other.transform) and self.material == other.material
+        return type(self) == type(other) and np.array_equal(self.transform, other.transform) and self.material == other.material
 
     def test_shape() -> 'TestShape':
         return TestShape()
 
-    def intersect(self, ray: Ray) -> Iterable[Intersection]:
+    def intersect(self, ray: Ray) -> List[Intersection]:
         local_ray = Ray.transform(ray, Matrix.inverse(self.transform))
         return self.local_intersect(local_ray)
 
